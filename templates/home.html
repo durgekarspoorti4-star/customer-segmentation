@@ -14,13 +14,20 @@
             font-family: Arial, sans-serif;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             min-height: 100vh;
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
         }
 
-        /* Navbar */
+        /* =========================
+           NAVBAR
+        ========================= */
+
         nav {
             height: 75px;
             display: flex;
@@ -29,23 +36,28 @@
             padding: 0 8%;
             background: rgba(255, 255, 255, 0.10);
             backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
         .logo {
             font-size: 24px;
             font-weight: bold;
+            white-space: nowrap;
         }
 
         .nav-links {
             display: flex;
-            gap: 25px;
             align-items: center;
+            gap: 25px;
         }
 
         .nav-links a {
             color: white;
             text-decoration: none;
             font-size: 16px;
+            transition: 0.3s;
         }
 
         .nav-links a:hover {
@@ -53,16 +65,25 @@
         }
 
         .login-btn {
-            padding: 10px 20px;
+            padding: 10px 22px;
             border-radius: 25px;
             background: white;
             color: #667eea !important;
             font-weight: bold;
         }
 
-        /* Hero */
+        .login-btn:hover {
+            background: #ffe082;
+            color: #5a4bb7 !important;
+        }
+
+
+        /* =========================
+           HERO SECTION
+        ========================= */
+
         .hero {
-            min-height: 550px;
+            min-height: 600px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -91,9 +112,15 @@
             margin-bottom: 30px;
         }
 
+
+        /* =========================
+           BUTTONS
+        ========================= */
+
         .buttons {
             display: flex;
             gap: 15px;
+            flex-wrap: wrap;
         }
 
         .btn {
@@ -102,6 +129,7 @@
             text-decoration: none;
             font-weight: bold;
             display: inline-block;
+            transition: 0.3s;
         }
 
         .primary {
@@ -118,17 +146,33 @@
             transform: translateY(-3px);
         }
 
-        /* Illustration */
+        .primary:hover {
+            background: #ffe082;
+            color: #5a4bb7;
+        }
+
+        .secondary:hover {
+            background: white;
+            color: #667eea;
+        }
+
+
+        /* =========================
+           CHART ILLUSTRATION
+        ========================= */
+
         .illustration {
             width: 400px;
             height: 350px;
-            background: rgba(255,255,255,0.12);
+            background: rgba(255, 255, 255, 0.12);
             border-radius: 30px;
             backdrop-filter: blur(10px);
+
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
         }
 
         .chart {
@@ -143,6 +187,13 @@
             width: 45px;
             border-radius: 8px 8px 0 0;
             background: white;
+            transition: 0.3s;
+        }
+
+        .bar:hover {
+            opacity: 0.8;
+            transform: scaleY(1.05);
+            transform-origin: bottom;
         }
 
         .bar1 {
@@ -170,13 +221,17 @@
             bottom: 29px;
             left: 0;
             width: 100%;
-            border-bottom: 2px solid rgba(255,255,255,0.6);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.6);
         }
 
-        /* Features */
+
+        /* =========================
+           FEATURES
+        ========================= */
+
         .features {
-            padding: 50px 8% 80px;
-            background: rgba(0,0,0,0.12);
+            padding: 60px 8% 80px;
+            background: rgba(0, 0, 0, 0.12);
             text-align: center;
         }
 
@@ -194,8 +249,14 @@
         .card {
             padding: 30px;
             border-radius: 20px;
-            background: rgba(255,255,255,0.12);
+            background: rgba(255, 255, 255, 0.12);
             backdrop-filter: blur(10px);
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.18);
         }
 
         .card .icon {
@@ -212,28 +273,41 @@
             line-height: 1.6;
         }
 
-        /* Footer */
+
+        /* =========================
+           FOOTER
+        ========================= */
+
         footer {
             text-align: center;
             padding: 25px;
-            background: rgba(0,0,0,0.2);
+            background: rgba(0, 0, 0, 0.2);
             color: #ddd;
         }
 
-        /* Mobile */
-        @media (max-width: 800px) {
 
-            .nav-links {
-                gap: 10px;
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 900px) {
+
+            nav {
+                padding: 0 5%;
             }
 
             .hero {
                 flex-direction: column;
                 text-align: center;
+                padding: 60px 5%;
+            }
+
+            .hero-text {
+                max-width: 700px;
             }
 
             .hero-text h1 {
-                font-size: 42px;
+                font-size: 46px;
             }
 
             .buttons {
@@ -249,26 +323,91 @@
                 grid-template-columns: 1fr;
             }
         }
+
+
+        @media (max-width: 600px) {
+
+            nav {
+                height: auto;
+                padding: 20px 5%;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .logo {
+                font-size: 21px;
+            }
+
+            .nav-links {
+                gap: 15px;
+            }
+
+            .nav-links a {
+                font-size: 14px;
+            }
+
+            .hero {
+                padding: 50px 5%;
+            }
+
+            .hero-text h1 {
+                font-size: 38px;
+            }
+
+            .hero-text p {
+                font-size: 16px;
+            }
+
+            .illustration {
+                height: 300px;
+            }
+
+            .chart {
+                transform: scale(0.8);
+            }
+
+            .features h2 {
+                font-size: 28px;
+            }
+        }
     </style>
 </head>
 
 <body>
 
-    <!-- Navbar -->
+    <!-- =========================
+         NAVBAR
+    ========================= -->
+
     <nav>
+
         <div class="logo">
             Customer Segmentation
         </div>
 
         <div class="nav-links">
-            <a href="/">Home</a>
-            <a href="/login" class="login-btn">Login</a>
-            <a href="/register">Register</a>
+
+            <a href="{{ url_for('home') }}">
+                Home
+            </a>
+
+            <a href="{{ url_for('login') }}" class="login-btn">
+                Login
+            </a>
+
+            <a href="{{ url_for('register') }}">
+                Register
+            </a>
+
         </div>
+
     </nav>
 
 
-    <!-- Hero Section -->
+    <!-- =========================
+         HERO SECTION
+    ========================= -->
+
     <section class="hero">
 
         <div class="hero-text">
@@ -286,19 +425,24 @@
             </p>
 
             <div class="buttons">
-                <a href="/login" class="btn primary">
+
+                <a href="{{ url_for('login') }}" class="btn primary">
                     Get Started
                 </a>
 
-                <a href="/register" class="btn secondary">
+                <a href="{{ url_for('register') }}" class="btn secondary">
                     Create Account
                 </a>
+
             </div>
 
         </div>
 
 
-        <!-- Simple Chart Illustration -->
+        <!-- =========================
+             CHART ILLUSTRATION
+        ========================= -->
+
         <div class="illustration">
 
             <div class="chart">
@@ -317,18 +461,27 @@
     </section>
 
 
-    <!-- Features -->
+    <!-- =========================
+         FEATURES
+    ========================= -->
+
     <section class="features">
 
-        <h2>What Our System Provides</h2>
+        <h2>
+            What Our System Provides
+        </h2>
 
         <div class="cards">
 
             <div class="card">
 
-                <div class="icon">📊</div>
+                <div class="icon">
+                    📊
+                </div>
 
-                <h3>Customer Analysis</h3>
+                <h3>
+                    Customer Analysis
+                </h3>
 
                 <p>
                     Analyze customer information such as
@@ -340,9 +493,13 @@
 
             <div class="card">
 
-                <div class="icon">🤖</div>
+                <div class="icon">
+                    🤖
+                </div>
 
-                <h3>K-Means Clustering</h3>
+                <h3>
+                    K-Means Clustering
+                </h3>
 
                 <p>
                     Use machine learning to group customers
@@ -354,9 +511,13 @@
 
             <div class="card">
 
-                <div class="icon">🎯</div>
+                <div class="icon">
+                    🎯
+                </div>
 
-                <h3>Customer Prediction</h3>
+                <h3>
+                    Customer Prediction
+                </h3>
 
                 <p>
                     Predict the customer segment using
@@ -370,7 +531,10 @@
     </section>
 
 
-    <!-- Footer -->
+    <!-- =========================
+         FOOTER
+    ========================= -->
+
     <footer>
 
         <p>
