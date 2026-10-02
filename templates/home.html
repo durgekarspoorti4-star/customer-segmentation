@@ -4,370 +4,383 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Customer Segmentation</title>
+    <title>Customer Segmentation | AI Analytics</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
-
-        html {
-            scroll-behavior: smooth;
         }
 
         body {
+            font-family: "Inter", sans-serif;
+            background: #f7f9fc;
+            color: #172033;
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
         }
 
-        /* =========================
-           NAVBAR
-        ========================= */
-
+        /* NAVBAR */
         nav {
             height: 75px;
+            padding: 0 7%;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 8%;
-            background: rgba(255, 255, 255, 0.10);
-            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.92);
+            border-bottom: 1px solid #e8edf5;
             position: sticky;
             top: 0;
-            z-index: 1000;
+            z-index: 100;
+            backdrop-filter: blur(12px);
         }
 
         .logo {
-            font-size: 24px;
-            font-weight: bold;
-            white-space: nowrap;
+            font-size: 21px;
+            font-weight: 800;
+            color: #172033;
+        }
+
+        .logo span {
+            color: #5b5ff7;
         }
 
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 25px;
+            gap: 28px;
         }
 
         .nav-links a {
-            color: white;
             text-decoration: none;
-            font-size: 16px;
+            color: #596579;
+            font-size: 14px;
+            font-weight: 600;
             transition: 0.3s;
         }
 
         .nav-links a:hover {
-            color: #ffe082;
+            color: #5b5ff7;
         }
 
         .login-btn {
-            padding: 10px 22px;
-            border-radius: 25px;
-            background: white;
-            color: #667eea !important;
-            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 9px;
+            background: #5b5ff7;
+            color: white !important;
         }
 
         .login-btn:hover {
-            background: #ffe082;
-            color: #5a4bb7 !important;
+            background: #4549d9;
         }
 
-
-        /* =========================
-           HERO SECTION
-        ========================= */
-
+        /* HERO */
         .hero {
-            min-height: 600px;
-            display: flex;
+            min-height: 590px;
+            padding: 75px 7%;
+            display: grid;
+            grid-template-columns: 1.05fr 0.95fr;
             align-items: center;
-            justify-content: space-between;
-            padding: 70px 8%;
-            gap: 50px;
+            gap: 70px;
+            background:
+                radial-gradient(circle at 80% 30%, #e5e7ff 0, transparent 30%),
+                linear-gradient(135deg, #ffffff, #f5f7ff);
         }
 
-        .hero-text {
-            max-width: 600px;
+        .badge {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 30px;
+            background: #eeeeff;
+            color: #5559e9;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 22px;
         }
 
-        .hero-text h1 {
-            font-size: 58px;
-            line-height: 1.1;
-            margin-bottom: 20px;
+        .hero h1 {
+            font-size: clamp(42px, 5vw, 68px);
+            line-height: 1.05;
+            letter-spacing: -2.5px;
+            margin-bottom: 22px;
         }
 
-        .hero-text h1 span {
-            color: #ffe082;
+        .hero h1 span {
+            color: #5b5ff7;
         }
 
-        .hero-text p {
-            font-size: 19px;
-            line-height: 1.7;
-            color: #f2f2f2;
-            margin-bottom: 30px;
+        .hero p {
+            max-width: 570px;
+            color: #687386;
+            font-size: 17px;
+            line-height: 1.8;
+            margin-bottom: 32px;
         }
-
-
-        /* =========================
-           BUTTONS
-        ========================= */
 
         .buttons {
             display: flex;
-            gap: 15px;
+            gap: 14px;
             flex-wrap: wrap;
         }
 
         .btn {
-            padding: 14px 28px;
-            border-radius: 30px;
             text-decoration: none;
-            font-weight: bold;
-            display: inline-block;
+            padding: 14px 24px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
             transition: 0.3s;
         }
 
         .primary {
-            background: white;
-            color: #667eea;
-        }
-
-        .secondary {
-            border: 2px solid white;
+            background: #5b5ff7;
             color: white;
-        }
-
-        .btn:hover {
-            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(91,95,247,0.25);
         }
 
         .primary:hover {
-            background: #ffe082;
-            color: #5a4bb7;
+            transform: translateY(-3px);
+            background: #474bdc;
+        }
+
+        .secondary {
+            border: 1px solid #dce1ec;
+            background: white;
+            color: #263044;
         }
 
         .secondary:hover {
-            background: white;
-            color: #667eea;
+            transform: translateY(-3px);
+            border-color: #5b5ff7;
+            color: #5b5ff7;
         }
 
+        /* DASHBOARD CARD */
+        .dashboard-card {
+            background: white;
+            border: 1px solid #e5e9f2;
+            border-radius: 22px;
+            padding: 28px;
+            box-shadow: 0 25px 70px rgba(35,45,80,0.12);
+        }
 
-        /* =========================
-           CHART ILLUSTRATION
-        ========================= */
-
-        .illustration {
-            width: 400px;
-            height: 350px;
-            background: rgba(255, 255, 255, 0.12);
-            border-radius: 30px;
-            backdrop-filter: blur(10px);
-
+        .card-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
+            margin-bottom: 25px;
+        }
 
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+        .card-header h3 {
+            font-size: 17px;
+        }
+
+        .status {
+            font-size: 11px;
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: #eafaf0;
+            color: #219653;
+            font-weight: 700;
         }
 
         .chart {
-            width: 280px;
-            height: 220px;
-            position: relative;
+            height: 190px;
+            display: flex;
+            align-items: end;
+            justify-content: space-around;
+            padding: 10px 5px;
+            border-bottom: 1px solid #e9edf4;
         }
 
         .bar {
-            position: absolute;
-            bottom: 30px;
-            width: 45px;
+            width: 35px;
             border-radius: 8px 8px 0 0;
-            background: white;
-            transition: 0.3s;
+            background: linear-gradient(to top, #5b5ff7, #8b8efc);
         }
 
-        .bar:hover {
-            opacity: 0.8;
-            transform: scaleY(1.05);
-            transform-origin: bottom;
-        }
+        .bar:nth-child(1) { height: 45%; }
+        .bar:nth-child(2) { height: 70%; }
+        .bar:nth-child(3) { height: 55%; }
+        .bar:nth-child(4) { height: 90%; }
+        .bar:nth-child(5) { height: 65%; }
+        .bar:nth-child(6) { height: 82%; }
 
-        .bar1 {
-            height: 80px;
-            left: 20px;
-        }
-
-        .bar2 {
-            height: 140px;
-            left: 90px;
-        }
-
-        .bar3 {
-            height: 190px;
-            left: 160px;
-        }
-
-        .bar4 {
-            height: 120px;
-            left: 230px;
-        }
-
-        .line {
-            position: absolute;
-            bottom: 29px;
-            left: 0;
-            width: 100%;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.6);
-        }
-
-
-        /* =========================
-           FEATURES
-        ========================= */
-
-        .features {
-            padding: 60px 8% 80px;
-            background: rgba(0, 0, 0, 0.12);
-            text-align: center;
-        }
-
-        .features h2 {
-            font-size: 35px;
-            margin-bottom: 40px;
-        }
-
-        .cards {
+        .stats {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 25px;
+            grid-template-columns: repeat(3,1fr);
+            gap: 12px;
+            margin-top: 22px;
         }
 
-        .card {
-            padding: 30px;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(10px);
-            transition: 0.3s;
+        .stat {
+            background: #f7f8fc;
+            padding: 15px;
+            border-radius: 12px;
         }
 
-        .card:hover {
-            transform: translateY(-8px);
-            background: rgba(255, 255, 255, 0.18);
+        .stat strong {
+            display: block;
+            font-size: 20px;
+            margin-bottom: 4px;
         }
 
-        .card .icon {
-            font-size: 40px;
-            margin-bottom: 15px;
+        .stat small {
+            color: #7b8495;
+            font-size: 11px;
         }
 
-        .card h3 {
+        /* FEATURES */
+        .section {
+            padding: 80px 7%;
+        }
+
+        .section-title {
+            text-align: center;
+            max-width: 650px;
+            margin: auto;
+        }
+
+        .section-title h2 {
+            font-size: 34px;
             margin-bottom: 12px;
         }
 
-        .card p {
-            color: #eeeeee;
-            line-height: 1.6;
+        .section-title p {
+            color: #707b8e;
+            line-height: 1.7;
         }
 
+        .features {
+            margin-top: 45px;
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            gap: 22px;
+        }
 
-        /* =========================
-           FOOTER
-        ========================= */
+        .feature {
+            background: white;
+            border: 1px solid #e8ecf3;
+            padding: 30px;
+            border-radius: 17px;
+            transition: 0.3s;
+        }
 
-        footer {
+        .feature:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 18px 40px rgba(35,45,80,0.09);
+        }
+
+        .icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: #eeeeff;
+            color: #5b5ff7;
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        .feature h3 {
+            margin-bottom: 10px;
+        }
+
+        .feature p {
+            color: #707b8e;
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        /* HOW IT WORKS */
+        .steps {
+            margin-top: 45px;
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            gap: 22px;
+        }
+
+        .step {
             text-align: center;
             padding: 25px;
-            background: rgba(0, 0, 0, 0.2);
-            color: #ddd;
         }
 
+        .number {
+            width: 45px;
+            height: 45px;
+            margin: auto auto 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #5b5ff7;
+            color: white;
+            font-weight: 800;
+        }
 
-        /* =========================
-           MOBILE
-        ========================= */
+        .step p {
+            color: #707b8e;
+            margin-top: 8px;
+            line-height: 1.6;
+            font-size: 14px;
+        }
 
-        @media (max-width: 900px) {
+        /* FOOTER */
+        footer {
+            background: #151a29;
+            color: #aeb6c7;
+            text-align: center;
+            padding: 28px;
+            font-size: 13px;
+        }
 
+        footer strong {
+            color: white;
+        }
+
+        /* MOBILE */
+        @media (max-width: 850px) {
+            .hero {
+                grid-template-columns: 1fr;
+                padding-top: 55px;
+            }
+
+            .features,
+            .steps {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                gap: 12px;
+            }
+
+            .nav-links a:not(.login-btn) {
+                display: none;
+            }
+
+            .hero h1 {
+                letter-spacing: -1.5px;
+            }
+        }
+
+        @media (max-width: 500px) {
             nav {
                 padding: 0 5%;
             }
 
-            .hero {
-                flex-direction: column;
-                text-align: center;
-                padding: 60px 5%;
+            .hero,
+            .section {
+                padding-left: 5%;
+                padding-right: 5%;
             }
 
-            .hero-text {
-                max-width: 700px;
-            }
-
-            .hero-text h1 {
-                font-size: 46px;
-            }
-
-            .buttons {
-                justify-content: center;
-            }
-
-            .illustration {
-                width: 100%;
-                max-width: 400px;
-            }
-
-            .cards {
+            .stats {
                 grid-template-columns: 1fr;
-            }
-        }
-
-
-        @media (max-width: 600px) {
-
-            nav {
-                height: auto;
-                padding: 20px 5%;
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .logo {
-                font-size: 21px;
-            }
-
-            .nav-links {
-                gap: 15px;
-            }
-
-            .nav-links a {
-                font-size: 14px;
-            }
-
-            .hero {
-                padding: 50px 5%;
-            }
-
-            .hero-text h1 {
-                font-size: 38px;
-            }
-
-            .hero-text p {
-                font-size: 16px;
-            }
-
-            .illustration {
-                height: 300px;
-            }
-
-            .chart {
-                transform: scale(0.8);
-            }
-
-            .features h2 {
-                font-size: 28px;
             }
         }
     </style>
@@ -375,173 +388,182 @@
 
 <body>
 
-    <!-- =========================
-         NAVBAR
-    ========================= -->
+<!-- NAVBAR -->
+<nav>
+    <div class="logo">
+        Customer <span>Segmentation</span>
+    </div>
 
-    <nav>
+    <div class="nav-links">
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('login') }}" class="login-btn">Login</a>
+        <a href="{{ url_for('register') }}">Register</a>
+    </div>
+</nav>
 
-        <div class="logo">
-            Customer Segmentation
+
+<!-- HERO -->
+<section class="hero">
+
+    <div>
+        <div class="badge">
+            ✦ MACHINE LEARNING • K-MEANS CLUSTERING
         </div>
 
-        <div class="nav-links">
-
-            <a href="{{ url_for('home') }}">
-                Home
-            </a>
-
-            <a href="{{ url_for('login') }}" class="login-btn">
-                Login
-            </a>
-
-            <a href="{{ url_for('register') }}">
-                Register
-            </a>
-
-        </div>
-
-    </nav>
-
-
-    <!-- =========================
-         HERO SECTION
-    ========================= -->
-
-    <section class="hero">
-
-        <div class="hero-text">
-
-            <h1>
-                Understand Your
-                <span>Customers</span>
-            </h1>
-
-            <p>
-                Discover meaningful customer groups using
-                Machine Learning and K-Means Clustering.
-                Analyze purchasing behaviour and make
-                smarter business decisions.
-            </p>
-
-            <div class="buttons">
-
-                <a href="{{ url_for('login') }}" class="btn primary">
-                    Get Started
-                </a>
-
-                <a href="{{ url_for('register') }}" class="btn secondary">
-                    Create Account
-                </a>
-
-            </div>
-
-        </div>
-
-
-        <!-- =========================
-             CHART ILLUSTRATION
-        ========================= -->
-
-        <div class="illustration">
-
-            <div class="chart">
-
-                <div class="bar bar1"></div>
-                <div class="bar bar2"></div>
-                <div class="bar bar3"></div>
-                <div class="bar bar4"></div>
-
-                <div class="line"></div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================
-         FEATURES
-    ========================= -->
-
-    <section class="features">
-
-        <h2>
-            What Our System Provides
-        </h2>
-
-        <div class="cards">
-
-            <div class="card">
-
-                <div class="icon">
-                    📊
-                </div>
-
-                <h3>
-                    Customer Analysis
-                </h3>
-
-                <p>
-                    Analyze customer information such as
-                    age, income and spending score.
-                </p>
-
-            </div>
-
-
-            <div class="card">
-
-                <div class="icon">
-                    🤖
-                </div>
-
-                <h3>
-                    K-Means Clustering
-                </h3>
-
-                <p>
-                    Use machine learning to group customers
-                    according to their purchasing behaviour.
-                </p>
-
-            </div>
-
-
-            <div class="card">
-
-                <div class="icon">
-                    🎯
-                </div>
-
-                <h3>
-                    Customer Prediction
-                </h3>
-
-                <p>
-                    Predict the customer segment using
-                    income and spending behaviour.
-                </p>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================
-         FOOTER
-    ========================= -->
-
-    <footer>
+        <h1>
+            Understand Your<br>
+            <span>Customers Better.</span>
+        </h1>
 
         <p>
-            © 2026 Customer Segmentation System
+            Transform customer data into meaningful segments using
+            K-Means clustering. Discover purchasing patterns and make
+            smarter customer-focused decisions.
         </p>
 
-    </footer>
+        <div class="buttons">
+            <a href="{{ url_for('login') }}" class="btn primary">
+                Get Started →
+            </a>
+
+            <a href="{{ url_for('register') }}" class="btn secondary">
+                Create Account
+            </a>
+        </div>
+    </div>
+
+
+    <!-- ANALYTICS CARD -->
+    <div class="dashboard-card">
+
+        <div class="card-header">
+            <h3>Customer Analytics</h3>
+            <span class="status">● Active</span>
+        </div>
+
+        <div class="chart">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <strong>3</strong>
+                <small>Segments</small>
+            </div>
+
+            <div class="stat">
+                <strong>ML</strong>
+                <small>Algorithm</small>
+            </div>
+
+            <div class="stat">
+                <strong>AI</strong>
+                <small>Analytics</small>
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- FEATURES -->
+<section class="section">
+
+    <div class="section-title">
+        <h2>Powerful Customer Insights</h2>
+        <p>
+            Analyze your customer data with simple and effective
+            machine learning tools.
+        </p>
+    </div>
+
+    <div class="features">
+
+        <div class="feature">
+            <div class="icon">◉</div>
+            <h3>Customer Analysis</h3>
+            <p>
+                Upload your customer dataset and explore important
+                purchasing and demographic information.
+            </p>
+        </div>
+
+        <div class="feature">
+            <div class="icon">✦</div>
+            <h3>K-Means Clustering</h3>
+            <p>
+                Automatically group customers into meaningful
+                segments based on their behaviour.
+            </p>
+        </div>
+
+        <div class="feature">
+            <div class="icon">⌁</div>
+            <h3>Customer Prediction</h3>
+            <p>
+                Enter customer information and identify the segment
+                that best matches their characteristics.
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- HOW IT WORKS -->
+<section class="section" style="background:#ffffff;">
+
+    <div class="section-title">
+        <h2>How It Works</h2>
+        <p>
+            Three simple steps to discover useful customer segments.
+        </p>
+    </div>
+
+    <div class="steps">
+
+        <div class="step">
+            <div class="number">1</div>
+            <h3>Upload Data</h3>
+            <p>
+                Upload your customer dataset to the system.
+            </p>
+        </div>
+
+        <div class="step">
+            <div class="number">2</div>
+            <h3>Apply K-Means</h3>
+            <p>
+                The system analyzes customer characteristics
+                and creates clusters.
+            </p>
+        </div>
+
+        <div class="step">
+            <div class="number">3</div>
+            <h3>View Results</h3>
+            <p>
+                Explore segments, charts and customer predictions.
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- FOOTER -->
+<footer>
+    © 2026 <strong>Customer Segmentation System</strong>
+    · K-Means Machine Learning Project
+</footer>
 
 </body>
 </html>
