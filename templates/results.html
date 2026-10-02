@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Results - Customer Segmentation</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <style>
+        body {
+            background: #f4f6f9;
+            font-family: Arial, sans-serif;
+        }
+
+        .sidebar {
+            width: 240px;
+            height: 100vh;
+            position: fixed;
+            background: #212529;
+            color: white;
+            padding: 25px 15px;
+        }
+
+        .sidebar h3 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 12px;
+            margin: 5px 0;
+            border-radius: 8px;
+        }
+
+        .sidebar a:hover {
+            background: #343a40;
+        }
+
+        .main {
+            margin-left: 240px;
+            padding: 30px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .graph {
+            width: 100%;
+            border-radius: 12px;
+        }
+
+        .table {
+            background: white;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="sidebar">
+
+    <h3>🤖 AI Smart ML</h3>
+
+    <a href="/">🏠 Dashboard</a>
+    <a href="/upload">📂 Upload Dataset</a>
+    <a href="/analysis">📊 Data Analysis</a>
+    <a href="/kmeans">⚙️ K-Means</a>
+    <a href="/results">📈 Results</a>
+
+</div>
+
+
+<div class="main">
+
+    <h1>Customer Segmentation Results</h1>
+
+    <p class="text-muted">
+        Results generated using K-Means Clustering
+    </p>
+
+
+    <!-- Cluster Summary -->
+
+    <div class="card p-4 mt-4">
+
+        <h3>📊 Cluster Summary</h3>
+
+        <div class="table-responsive mt-3">
+
+            {{ summary_table | safe }}
+
+        </div>
+
+    </div>
+
+
+    <!-- Graph -->
+
+    <div class="card p-4 mt-4">
+
+        <h3>📈 Customer Clusters</h3>
+
+        <img src="{{ url_for('static', filename='graphs/results.png') }}"
+             class="graph mt-3">
+
+    </div>
+
+
+    <!-- Customer Data -->
+
+    <div class="card p-4 mt-4">
+
+        <h3>👥 Customer Segmentation Data</h3>
+
+        <div class="table-responsive mt-3">
+
+            {{ customer_table | safe }}
+
+        </div>
+
+    </div>
+
+
+    <div class="mt-4">
+
+        <a href="/kmeans" class="btn btn-primary">
+            ← Back to K-Means
+        </a>
+        <a href="/download" class="btn btn-success">Download Results</a>
+        <a href="/" class="btn btn-dark">
+            🏠 Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

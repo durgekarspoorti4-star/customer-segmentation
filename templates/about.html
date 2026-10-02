@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Elbow Method</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <style>
+
+        body {
+            background: #f4f6f9;
+            font-family: Arial, sans-serif;
+        }
+
+        .main {
+            padding: 40px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .graph {
+            width: 100%;
+            max-width: 900px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="main">
+
+    <h1>📉 Elbow Method</h1>
+
+    <p class="text-muted">
+        Finding a suitable number of clusters for K-Means.
+    </p>
+
+    <div class="card mt-4">
+
+        <img
+            src="{{ url_for('static', filename='graphs/elbow.png') }}"
+            class="graph"
+        >
+
+        <hr>
+
+        <h4>Why use the Elbow Method?</h4>
+
+        <p>
+            The Elbow Method compares different values of K
+            and their inertia. The point where the decrease in
+            inertia starts becoming smaller is called the
+            "elbow".
+        </p>
+
+        <a href="/kmeans" class="btn btn-primary">
+            ⚙️ Go to K-Means
+        </a>
+
+        <a href="/" class="btn btn-dark">
+            🏠 Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

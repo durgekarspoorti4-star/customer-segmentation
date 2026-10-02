@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Upload Dataset</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+        body {
+            background: #f4f6f9;
+            font-family: Arial, sans-serif;
+        }
+
+        .upload-card {
+            max-width: 650px;
+            margin: 100px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 18px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .upload-box {
+            border: 2px dashed #aaa;
+            padding: 50px 20px;
+            text-align: center;
+            border-radius: 15px;
+        }
+
+        .upload-box:hover {
+            border-color: #0d6efd;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="upload-card">
+
+        <h2 class="text-center mb-3">
+            📁 Upload Customer Dataset
+        </h2>
+
+        <p class="text-center text-muted">
+            Upload a CSV file containing customer information.
+        </p>
+
+        <form
+            action="/upload"
+            method="POST"
+            enctype="multipart/form-data"
+        >
+
+            <div class="upload-box">
+
+                <h5>Select CSV File</h5>
+
+                <input
+                    type="file"
+                    name="file"
+                    class="form-control mt-3"
+                    accept=".csv"
+                    required
+                >
+
+                <button
+                    type="submit"
+                    class="btn btn-primary mt-4"
+                >
+                    Upload Dataset
+                </button>
+
+            </div>
+
+        </form>
+
+        <div class="text-center mt-4">
+
+            <a href="/" class="btn btn-outline-secondary">
+                ← Back to Dashboard
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

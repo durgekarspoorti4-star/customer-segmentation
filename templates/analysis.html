@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Data Analysis</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <style>
+
+        body {
+            background: #f4f6f9;
+            font-family: Arial, sans-serif;
+        }
+
+        .main {
+            padding: 40px;
+        }
+
+        .card-box {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .stat {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container-fluid">
+
+    <div class="main">
+
+        <h1>📊 Data Analysis</h1>
+
+        <p class="text-muted">
+            Understand the customer dataset before clustering.
+        </p>
+
+
+        <!-- Statistics -->
+
+        <div class="row g-4">
+
+            <div class="col-md-3">
+
+                <div class="card-box">
+
+                    <h6>Total Customers</h6>
+
+                    <div class="stat">
+                        {{ total_customers }}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-3">
+
+                <div class="card-box">
+
+                    <h6>Average Age</h6>
+
+                    <div class="stat">
+                        {{ average_age }}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-3">
+
+                <div class="card-box">
+
+                    <h6>Average Income</h6>
+
+                    <div class="stat">
+                        {{ average_income }}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-3">
+
+                <div class="card-box">
+
+                    <h6>Average Spending</h6>
+
+                    <div class="stat">
+                        {{ average_spending }}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Dataset Information -->
+
+        <div class="card-box">
+
+            <h4>Dataset Information</h4>
+
+            <table class="table table-bordered">
+
+                <tr>
+                    <th>Rows</th>
+                    <td>{{ total_customers }}</td>
+                </tr>
+
+                <tr>
+                    <th>Columns</th>
+                    <td>{{ total_columns }}</td>
+                </tr>
+
+                <tr>
+                    <th>Missing Values</th>
+                    <td>{{ missing_values }}</td>
+                </tr>
+
+            </table>
+
+        </div>
+
+
+        <!-- Data Preview -->
+
+        <div class="card-box">
+
+            <h4>Customer Data Preview</h4>
+
+            <div class="table-responsive">
+
+                {{ table|safe }}
+
+            </div>
+
+        </div>
+
+
+        <a
+            href="/"
+            class="btn btn-primary">
+
+            ← Back to Dashboard
+
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>
