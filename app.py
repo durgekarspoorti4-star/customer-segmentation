@@ -10,12 +10,15 @@ import json
 
 app = Flask(__name__)
 
-app.secret_key = os.environ.get("SECRET_KEY")
+app.config["SECRET_KEY"] = os.environ.get(
+    "SECRET_KEY",
+    "customer-segmentation-local-dev-key"
+)
 
 app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE="Lax",
-    SESSION_COOKIE_SECURE=True
+    SESSION_COOKIE_SECURE=bool(os.environ.get("RENDER"))
 )
 
 # === RENDER PATH FIX ===
