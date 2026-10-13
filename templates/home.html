@@ -1,386 +1,1020 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <meta name="description"
+          content="Discover customer behaviour with AI-powered customer segmentation using K-Means clustering.">
+
     <title>Customer Segmentation | AI Analytics</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+          rel="stylesheet">
 
     <style>
+        :root {
+            --primary: #635bff;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --dark: #15172b;
+            --text: #515a70;
+            --muted: #8991a5;
+            --background: #f7f8ff;
+            --white: #ffffff;
+            --border: #e9eaf5;
+            --success: #16a36a;
+            --shadow: 0 20px 60px rgba(40, 43, 90, 0.09);
+            --radius: 20px;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 90px;
+        }
+
         body {
             font-family: "Inter", sans-serif;
-            background: #f7f9fc;
-            color: #172033;
-            min-height: 100vh;
+            color: var(--dark);
+            background: var(--background);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        button,
+        a {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .container {
+            width: min(1160px, 90%);
+            margin: auto;
         }
 
         /* NAVBAR */
-        nav {
-            height: 75px;
-            padding: 0 7%;
+
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(230, 232, 245, 0.8);
+        }
+
+        .nav-inner {
+            min-height: 76px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: rgba(255,255,255,0.92);
-            border-bottom: 1px solid #e8edf5;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(12px);
+            gap: 25px;
         }
 
-        .logo {
-            font-size: 21px;
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            color: var(--dark);
+            font-size: 19px;
             font-weight: 800;
-            color: #172033;
+            letter-spacing: -0.6px;
+            white-space: nowrap;
         }
 
-        .logo span {
-            color: #5b5ff7;
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 13px;
+            display: grid;
+            place-items: center;
+            color: white;
+            font-size: 21px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            box-shadow: 0 8px 20px rgba(99, 91, 255, 0.25);
+        }
+
+        .brand span {
+            color: var(--primary);
         }
 
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 28px;
+            gap: 30px;
         }
 
-        .nav-links a {
-            text-decoration: none;
-            color: #596579;
-            font-size: 14px;
+        .nav-links > a:not(.nav-button) {
+            color: var(--text);
+            font-size: 13px;
             font-weight: 600;
-            transition: 0.3s;
+            transition: color 0.25s;
         }
 
-        .nav-links a:hover {
-            color: #5b5ff7;
+        .nav-links > a:hover {
+            color: var(--primary);
         }
 
-        .login-btn {
-            padding: 10px 20px;
-            border-radius: 9px;
-            background: #5b5ff7;
-            color: white !important;
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .login-btn:hover {
-            background: #4549d9;
+        .nav-button {
+            padding: 11px 19px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            transition: 0.25s;
+        }
+
+        .login {
+            color: var(--primary);
+            border: 1px solid var(--border);
+            background: white;
+        }
+
+        .register {
+            color: white;
+            background: var(--primary);
+            box-shadow: 0 6px 18px rgba(99, 91, 255, 0.22);
+        }
+
+        .nav-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .register:hover {
+            background: var(--primary-dark);
+        }
+
+        .menu-toggle {
+            display: none;
+            border: 0;
+            background: white;
+            color: var(--dark);
+            font-size: 27px;
+            cursor: pointer;
         }
 
         /* HERO */
+
         .hero {
-            min-height: 590px;
-            padding: 75px 7%;
-            display: grid;
-            grid-template-columns: 1.05fr 0.95fr;
-            align-items: center;
-            gap: 70px;
+            position: relative;
+            padding: 92px 0 88px;
             background:
-                radial-gradient(circle at 80% 30%, #e5e7ff 0, transparent 30%),
-                linear-gradient(135deg, #ffffff, #f5f7ff);
+                radial-gradient(circle at 85% 15%,
+                    rgba(196, 181, 253, 0.28), transparent 27%),
+                radial-gradient(circle at 5% 70%,
+                    rgba(191, 219, 254, 0.23), transparent 25%),
+                linear-gradient(135deg, #ffffff, #f7f7ff);
+            overflow: hidden;
         }
 
-        .badge {
-            display: inline-block;
-            padding: 8px 14px;
-            border-radius: 30px;
-            background: #eeeeff;
-            color: #5559e9;
-            font-size: 12px;
-            font-weight: 700;
-            margin-bottom: 22px;
-        }
-
-        .hero h1 {
-            font-size: clamp(42px, 5vw, 68px);
-            line-height: 1.05;
-            letter-spacing: -2.5px;
-            margin-bottom: 22px;
-        }
-
-        .hero h1 span {
-            color: #5b5ff7;
-        }
-
-        .hero p {
-            max-width: 570px;
-            color: #687386;
-            font-size: 17px;
-            line-height: 1.8;
-            margin-bottom: 32px;
-        }
-
-        .buttons {
-            display: flex;
-            gap: 14px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            text-decoration: none;
-            padding: 14px 24px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 14px;
-            transition: 0.3s;
-        }
-
-        .primary {
-            background: #5b5ff7;
-            color: white;
-            box-shadow: 0 10px 25px rgba(91,95,247,0.25);
-        }
-
-        .primary:hover {
-            transform: translateY(-3px);
-            background: #474bdc;
-        }
-
-        .secondary {
-            border: 1px solid #dce1ec;
-            background: white;
-            color: #263044;
-        }
-
-        .secondary:hover {
-            transform: translateY(-3px);
-            border-color: #5b5ff7;
-            color: #5b5ff7;
-        }
-
-        /* DASHBOARD CARD */
-        .dashboard-card {
-            background: white;
-            border: 1px solid #e5e9f2;
-            border-radius: 22px;
-            padding: 28px;
-            box-shadow: 0 25px 70px rgba(35,45,80,0.12);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.03fr 0.97fr;
             align-items: center;
+            gap: 65px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 9px 14px;
+            color: var(--primary-dark);
+            background: #efedff;
+            border: 1px solid #e5e1ff;
+            border-radius: 40px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.8px;
             margin-bottom: 25px;
         }
 
-        .card-header h3 {
+        .eyebrow i {
+            font-size: 15px;
+        }
+
+        .hero h1 {
+            font-size: clamp(42px, 5.1vw, 66px);
+            font-weight: 800;
+            line-height: 1.12;
+            letter-spacing: -3px;
+            margin-bottom: 23px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(100deg, #635bff, #a855f7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero-description {
+            max-width: 530px;
+            color: var(--text);
+            font-size: 16px;
+            line-height: 1.9;
+            margin-bottom: 30px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .button {
+            min-height: 49px;
+            padding: 13px 21px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            border-radius: 11px;
+            font-size: 13px;
+            font-weight: 700;
+            transition: transform 0.25s, box-shadow 0.25s;
+        }
+
+        .button:hover {
+            transform: translateY(-3px);
+        }
+
+        .button-primary {
+            color: white;
+            background: linear-gradient(110deg, var(--primary), var(--secondary));
+            box-shadow: 0 10px 25px rgba(99, 91, 255, 0.25);
+        }
+
+        .button-primary:hover {
+            box-shadow: 0 14px 30px rgba(99, 91, 255, 0.35);
+        }
+
+        .button-secondary {
+            color: var(--dark);
+            background: white;
+            border: 1px solid #e3e5f0;
+        }
+
+        .trust-line {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 27px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .trust-line i {
+            color: var(--success);
             font-size: 17px;
         }
 
-        .status {
-            font-size: 11px;
-            padding: 6px 10px;
-            border-radius: 20px;
-            background: #eafaf0;
-            color: #219653;
-            font-weight: 700;
+        /* ANALYTICS PREVIEW */
+
+        .preview-wrap {
+            position: relative;
         }
 
-        .chart {
-            height: 190px;
-            display: flex;
-            align-items: end;
-            justify-content: space-around;
-            padding: 10px 5px;
-            border-bottom: 1px solid #e9edf4;
-        }
-
-        .bar {
-            width: 35px;
-            border-radius: 8px 8px 0 0;
-            background: linear-gradient(to top, #5b5ff7, #8b8efc);
-        }
-
-        .bar:nth-child(1) { height: 45%; }
-        .bar:nth-child(2) { height: 70%; }
-        .bar:nth-child(3) { height: 55%; }
-        .bar:nth-child(4) { height: 90%; }
-        .bar:nth-child(5) { height: 65%; }
-        .bar:nth-child(6) { height: 82%; }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(3,1fr);
-            gap: 12px;
-            margin-top: 22px;
-        }
-
-        .stat {
-            background: #f7f8fc;
-            padding: 15px;
-            border-radius: 12px;
-        }
-
-        .stat strong {
-            display: block;
-            font-size: 20px;
-            margin-bottom: 4px;
-        }
-
-        .stat small {
-            color: #7b8495;
-            font-size: 11px;
-        }
-
-        /* FEATURES */
-        .section {
-            padding: 80px 7%;
-        }
-
-        .section-title {
-            text-align: center;
-            max-width: 650px;
-            margin: auto;
-        }
-
-        .section-title h2 {
-            font-size: 34px;
-            margin-bottom: 12px;
-        }
-
-        .section-title p {
-            color: #707b8e;
-            line-height: 1.7;
-        }
-
-        .features {
-            margin-top: 45px;
-            display: grid;
-            grid-template-columns: repeat(3,1fr);
-            gap: 22px;
-        }
-
-        .feature {
-            background: white;
-            border: 1px solid #e8ecf3;
-            padding: 30px;
-            border-radius: 17px;
-            transition: 0.3s;
-        }
-
-        .feature:hover {
-            transform: translateY(-7px);
-            box-shadow: 0 18px 40px rgba(35,45,80,0.09);
-        }
-
-        .icon {
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            background: #eeeeff;
-            color: #5b5ff7;
-            font-size: 22px;
-            margin-bottom: 20px;
-        }
-
-        .feature h3 {
-            margin-bottom: 10px;
-        }
-
-        .feature p {
-            color: #707b8e;
-            line-height: 1.7;
-            font-size: 14px;
-        }
-
-        /* HOW IT WORKS */
-        .steps {
-            margin-top: 45px;
-            display: grid;
-            grid-template-columns: repeat(3,1fr);
-            gap: 22px;
-        }
-
-        .step {
-            text-align: center;
-            padding: 25px;
-        }
-
-        .number {
-            width: 45px;
-            height: 45px;
-            margin: auto auto 18px;
+        .glow {
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            background: rgba(139, 92, 246, 0.15);
+            filter: blur(75px);
             border-radius: 50%;
+            top: 10%;
+            left: 25%;
+            z-index: 0;
+        }
+
+        .analytics-card {
+            position: relative;
+            z-index: 1;
+            padding: 27px;
+            border: 1px solid rgba(228, 230, 245, 0.95);
+            background: rgba(255, 255, 255, 0.94);
+            border-radius: 23px;
+            box-shadow: 0 30px 80px rgba(39, 41, 87, 0.13);
+            animation: float 5s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-7px);
+            }
+        }
+
+        .analytics-header {
             display: flex;
             align-items: center;
-            justify-content: center;
-            background: #5b5ff7;
-            color: white;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .analytics-heading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .analytics-symbol {
+            width: 43px;
+            height: 43px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            background: #eeecff;
+            color: var(--primary);
+            font-size: 21px;
+        }
+
+        .analytics-heading h3 {
+            font-size: 15px;
             font-weight: 800;
         }
 
-        .step p {
-            color: #707b8e;
-            margin-top: 8px;
-            line-height: 1.6;
+        .analytics-heading p {
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 3px;
+        }
+
+        .active-badge {
+            padding: 7px 10px;
+            border-radius: 20px;
+            background: #e9fbf2;
+            color: #148354;
+            font-size: 10px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .active-badge::before {
+            content: "";
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            margin-right: 5px;
+            background: #20b878;
+            border-radius: 50%;
+            vertical-align: middle;
+        }
+
+        .chart-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin: 22px 0 15px;
+        }
+
+        .chart-title strong {
+            font-size: 12px;
+        }
+
+        .chart-title span {
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .bar-chart {
+            height: 175px;
+            padding: 14px 10px 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            gap: 15px;
+            border-bottom: 1px solid var(--border);
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent 0,
+                transparent 42px,
+                #f0f1f8 43px
+            );
+        }
+
+        .bar-group {
+            height: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 9px;
+        }
+
+        .bar {
+            width: min(34px, 75%);
+            min-height: 15px;
+            border-radius: 7px 7px 2px 2px;
+            background: linear-gradient(180deg, #a78bfa, #635bff);
+            transition: filter 0.3s, transform 0.3s;
+            animation: grow 1.1s ease-out both;
+            transform-origin: bottom;
+        }
+
+        .bar:hover {
+            filter: brightness(1.1);
+            transform: scaleX(1.12);
+        }
+
+        @keyframes grow {
+            from {
+                transform: scaleY(0.1);
+            }
+            to {
+                transform: scaleY(1);
+            }
+        }
+
+        .bar-group small {
+            color: var(--muted);
+            font-size: 9px;
+            margin-bottom: 9px;
+        }
+
+        .mini-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 11px;
+            margin-top: 21px;
+        }
+
+        .mini-stat {
+            padding: 14px 11px;
+            border: 1px solid #eff0f7;
+            background: #fafaff;
+            border-radius: 13px;
+        }
+
+        .mini-stat strong {
+            display: block;
+            font-size: 20px;
+            letter-spacing: -0.7px;
+        }
+
+        .mini-stat span {
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+            margin-top: 4px;
+        }
+
+        .mini-stat:nth-child(2) strong {
+            color: #7c3aed;
+        }
+
+        .mini-stat:nth-child(3) strong {
+            color: #15976a;
+        }
+
+        .segment-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 13px;
+            margin-top: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text);
+            font-size: 10px;
+        }
+
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .dot-low {
+            background: #f59e0b;
+        }
+
+        .dot-medium {
+            background: #8b5cf6;
+        }
+
+        .dot-high {
+            background: #10b981;
+        }
+
+        /* GENERAL SECTIONS */
+
+        .section {
+            padding: 88px 0;
+        }
+
+        .section-white {
+            background: white;
+        }
+
+        .section-heading {
+            max-width: 650px;
+            text-align: center;
+            margin: 0 auto 48px;
+        }
+
+        .section-tag {
+            display: inline-block;
+            color: var(--primary);
+            background: #efedff;
+            padding: 7px 13px;
+            border-radius: 30px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .section-heading h2 {
+            font-size: clamp(28px, 3.5vw, 39px);
+            font-weight: 800;
+            line-height: 1.25;
+            letter-spacing: -1.3px;
+            margin-bottom: 15px;
+        }
+
+        .section-heading p {
+            color: var(--text);
             font-size: 14px;
+            line-height: 1.9;
+        }
+
+        /* FEATURES */
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+        }
+
+        .feature-card {
+            position: relative;
+            padding: 30px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: white;
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-7px);
+            border-color: #d6d0ff;
+            box-shadow: var(--shadow);
+        }
+
+        .feature-icon {
+            width: 53px;
+            height: 53px;
+            display: grid;
+            place-items: center;
+            border-radius: 16px;
+            font-size: 24px;
+            margin-bottom: 23px;
+        }
+
+        .icon-purple {
+            color: #635bff;
+            background: #efedff;
+        }
+
+        .icon-blue {
+            color: #2775e8;
+            background: #eaf3ff;
+        }
+
+        .icon-green {
+            color: #0b9b70;
+            background: #e4fbf2;
+        }
+
+        .icon-orange {
+            color: #d97706;
+            background: #fff4df;
+        }
+
+        .icon-pink {
+            color: #db2777;
+            background: #fce7f3;
+        }
+
+        .icon-cyan {
+            color: #0891b2;
+            background: #e0f7ff;
+        }
+
+        .feature-card h3 {
+            font-size: 17px;
+            margin-bottom: 11px;
+        }
+
+        .feature-card p {
+            color: var(--text);
+            font-size: 13px;
+            line-height: 1.9;
+        }
+
+        /* HOW IT WORKS */
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+
+        .step-card {
+            padding: 32px 25px;
+            text-align: center;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: var(--radius);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .step-number {
+            width: 52px;
+            height: 52px;
+            display: grid;
+            place-items: center;
+            margin: 0 auto 21px;
+            border-radius: 17px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-size: 19px;
+            font-weight: 800;
+            box-shadow: 0 8px 20px rgba(99, 91, 255, 0.2);
+        }
+
+        .step-card h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .step-card p {
+            color: var(--text);
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        /* CTA */
+
+        .cta-section {
+            padding: 20px 0 90px;
+        }
+
+        .cta-box {
+            position: relative;
+            overflow: hidden;
+            padding: 58px 30px;
+            border-radius: 26px;
+            text-align: center;
+            color: white;
+            background: linear-gradient(120deg, #4f46e5, #7c3aed, #9333ea);
+            box-shadow: 0 20px 50px rgba(99, 91, 255, 0.2);
+        }
+
+        .cta-box::before,
+        .cta-box::after {
+            content: "";
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+        }
+
+        .cta-box::before {
+            top: -130px;
+            left: -70px;
+        }
+
+        .cta-box::after {
+            bottom: -150px;
+            right: -50px;
+        }
+
+        .cta-box h2 {
+            position: relative;
+            z-index: 1;
+            font-size: clamp(27px, 4vw, 38px);
+            font-weight: 800;
+            line-height: 1.3;
+            margin-bottom: 13px;
+        }
+
+        .cta-box p {
+            position: relative;
+            z-index: 1;
+            max-width: 570px;
+            margin: 0 auto 26px;
+            color: #eceaff;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .cta-box .button {
+            position: relative;
+            z-index: 1;
+            color: var(--primary-dark);
+            background: white;
+        }
+
+        .cta-box .button:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.13);
         }
 
         /* FOOTER */
+
         footer {
-            background: #151a29;
-            color: #aeb6c7;
-            text-align: center;
-            padding: 28px;
-            font-size: 13px;
+            background: #15172b;
+            color: #a9b0c6;
+            padding: 38px 0 22px;
         }
 
-        footer strong {
+        .footer-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 25px;
+            padding-bottom: 27px;
+        }
+
+        .footer-brand {
+            color: white;
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .footer-brand span {
+            color: #a5a0ff;
+        }
+
+        .footer-description {
+            font-size: 12px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: #c0c5d6;
+            font-size: 12px;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
             color: white;
         }
 
-        /* MOBILE */
-        @media (max-width: 850px) {
-            .hero {
-                grid-template-columns: 1fr;
-                padding-top: 55px;
-            }
+        .footer-bottom {
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            color: #929ab0;
+            font-size: 11px;
+        }
 
-            .features,
-            .steps {
-                grid-template-columns: 1fr;
-            }
+        /* RESPONSIVE NAVIGATION */
 
+        @media (max-width: 950px) {
             .nav-links {
-                gap: 12px;
+                gap: 17px;
             }
 
-            .nav-links a:not(.login-btn) {
-                display: none;
+            .hero-grid {
+                gap: 35px;
             }
 
             .hero h1 {
-                letter-spacing: -1.5px;
+                letter-spacing: -2px;
+            }
+
+            .analytics-card {
+                padding: 21px;
+            }
+
+            .feature-card {
+                padding: 24px;
             }
         }
 
-        @media (max-width: 500px) {
-            nav {
-                padding: 0 5%;
+        @media (max-width: 760px) {
+            .nav-inner {
+                min-height: 70px;
             }
 
-            .hero,
-            .section {
-                padding-left: 5%;
-                padding-right: 5%;
+            .menu-toggle {
+                display: block;
             }
 
-            .stats {
+            .nav-actions {
+                margin-left: auto;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                right: 0;
+                padding: 20px 5%;
+                background: white;
+                border-bottom: 1px solid var(--border);
+                box-shadow: 0 15px 25px rgba(20, 25, 60, 0.07);
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0;
+            }
+
+            .nav-links.open {
+                display: flex;
+            }
+
+            .nav-links > a:not(.nav-button) {
+                display: block;
+                padding: 12px 0;
+            }
+
+            .nav-links .nav-button {
+                display: block;
+                text-align: center;
+                margin-top: 8px;
+            }
+
+            .nav-actions {
+                display: none;
+            }
+
+            .hero {
+                padding: 65px 0;
+            }
+
+            .hero-grid {
                 grid-template-columns: 1fr;
+                gap: 45px;
+            }
+
+            .hero-content {
+                text-align: center;
+            }
+
+            .hero-description {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-buttons,
+            .trust-line {
+                justify-content: center;
+            }
+
+            .preview-wrap {
+                width: min(100%, 520px);
+                margin: auto;
+            }
+
+            .features-grid,
+            .steps-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .feature-card {
+                padding: 27px;
+            }
+
+            .section {
+                padding: 65px 0;
+            }
+
+            .section-heading {
+                margin-bottom: 35px;
+            }
+
+            .footer-main {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                width: 91%;
+            }
+
+            .brand {
+                font-size: 16px;
+            }
+
+            .brand-icon {
+                width: 37px;
+                height: 37px;
+                font-size: 18px;
+            }
+
+            .hero h1 {
+                font-size: 42px;
+                letter-spacing: -2px;
+            }
+
+            .hero-description {
+                font-size: 14px;
+            }
+
+            .button {
+                width: 100%;
+            }
+
+            .analytics-card {
+                padding: 17px;
+                border-radius: 18px;
+            }
+
+            .mini-stats {
+                gap: 7px;
+            }
+
+            .mini-stat {
+                padding: 12px 8px;
+            }
+
+            .mini-stat strong {
+                font-size: 17px;
+            }
+
+            .mini-stat span {
+                font-size: 9px;
+            }
+
+            .bar-chart {
+                gap: 8px;
+            }
+
+            .segment-legend {
+                gap: 9px;
+            }
+
+            .legend-item {
+                font-size: 9px;
+            }
+
+            .cta-box {
+                padding: 43px 22px;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+            }
+        }
+
+        /* REDUCE ANIMATION WHEN REQUESTED */
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
             }
         }
     </style>
@@ -388,182 +1022,460 @@
 
 <body>
 
-<!-- NAVBAR -->
-<nav>
-    <div class="logo">
-        Customer <span>Segmentation</span>
+<!-- NAVIGATION -->
+
+<header class="navbar">
+    <div class="container nav-inner">
+
+        <a href="{{ url_for('home') }}" class="brand">
+            <span class="brand-icon">
+                <i class="bi bi-diagram-3-fill"></i>
+            </span>
+            <span style="color: var(--dark);">
+                Customer <span>Segmentation</span>
+            </span>
+        </a>
+
+        <nav class="nav-links" id="navLinks" aria-label="Main navigation">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="#features">Features</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#about">About</a>
+            <a href="{{ url_for('login') }}" class="nav-button login">Login</a>
+            <a href="{{ url_for('register') }}" class="nav-button register">Create Account</a>
+        </nav>
+
+        <button class="menu-toggle"
+                id="menuToggle"
+                type="button"
+                aria-label="Toggle navigation"
+                aria-expanded="false"
+                aria-controls="navLinks">
+            <i class="bi bi-list"></i>
+        </button>
+
     </div>
-
-    <div class="nav-links">
-        <a href="{{ url_for('home') }}">Home</a>
-        <a href="{{ url_for('login') }}" class="login-btn">Login</a>
-        <a href="{{ url_for('register') }}">Register</a>
-    </div>
-</nav>
+</header>
 
 
-<!-- HERO -->
-<section class="hero">
+<!-- HERO SECTION -->
 
-    <div>
-        <div class="badge">
-            ✦ MACHINE LEARNING • K-MEANS CLUSTERING
-        </div>
+<main>
 
-        <h1>
-            Understand Your<br>
-            <span>Customers Better.</span>
-        </h1>
+<section class="hero" id="about">
+    <div class="container hero-grid">
 
-        <p>
-            Transform customer data into meaningful segments using
-            K-Means clustering. Discover purchasing patterns and make
-            smarter customer-focused decisions.
-        </p>
+        <div class="hero-content">
 
-        <div class="buttons">
-            <a href="{{ url_for('login') }}" class="btn primary">
-                Get Started →
-            </a>
-
-            <a href="{{ url_for('register') }}" class="btn secondary">
-                Create Account
-            </a>
-        </div>
-    </div>
-
-
-    <!-- ANALYTICS CARD -->
-    <div class="dashboard-card">
-
-        <div class="card-header">
-            <h3>Customer Analytics</h3>
-            <span class="status">● Active</span>
-        </div>
-
-        <div class="chart">
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-        </div>
-
-        <div class="stats">
-            <div class="stat">
-                <strong>3</strong>
-                <small>Segments</small>
+            <div class="eyebrow">
+                <i class="bi bi-stars"></i>
+                AI-POWERED CUSTOMER ANALYTICS
             </div>
 
-            <div class="stat">
-                <strong>ML</strong>
-                <small>Algorithm</small>
+            <h1>
+                Understand Your
+                <span class="gradient-text">Customers Better.</span>
+            </h1>
+
+            <p class="hero-description">
+                Turn customer data into meaningful insights.
+                Discover spending patterns, identify customer groups,
+                and make informed decisions using K-Means clustering.
+            </p>
+
+            <div class="hero-buttons">
+                <a href="{{ url_for('login') }}" class="button button-primary">
+                    Get Started
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+
+                <a href="#features" class="button button-secondary">
+                    <i class="bi bi-grid"></i>
+                    Explore Features
+                </a>
             </div>
 
-            <div class="stat">
-                <strong>AI</strong>
-                <small>Analytics</small>
+            <div class="trust-line">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>Simple analysis · Clear insights · Data-driven decisions</span>
+            </div>
+
+        </div>
+
+
+        <!-- DECORATIVE ANALYTICS PREVIEW -->
+
+        <div class="preview-wrap">
+
+            <div class="glow"></div>
+
+            <div class="analytics-card">
+
+                <div class="analytics-header">
+
+                    <div class="analytics-heading">
+                        <div class="analytics-symbol">
+                            <i class="bi bi-bar-chart-line-fill"></i>
+                        </div>
+
+                        <div>
+                            <h3>Customer Analytics</h3>
+                            <p>Segmentation overview</p>
+                        </div>
+                    </div>
+
+                    <span class="active-badge">Preview</span>
+
+                </div>
+
+                <div class="chart-title">
+                    <strong>Customer Spending Overview</strong>
+                    <span>Illustrative data</span>
+                </div>
+
+                <div class="bar-chart" aria-label="Decorative bar chart preview">
+
+                    <div class="bar-group">
+                        <div class="bar" style="height: 40%;"></div>
+                        <small>Jan</small>
+                    </div>
+
+                    <div class="bar-group">
+                        <div class="bar" style="height: 64%;"></div>
+                        <small>Feb</small>
+                    </div>
+
+                    <div class="bar-group">
+                        <div class="bar" style="height: 48%;"></div>
+                        <small>Mar</small>
+                    </div>
+
+                    <div class="bar-group">
+                        <div class="bar" style="height: 88%;"></div>
+                        <small>Apr</small>
+                    </div>
+
+                    <div class="bar-group">
+                        <div class="bar" style="height: 67%;"></div>
+                        <small>May</small>
+                    </div>
+
+                    <div class="bar-group">
+                        <div class="bar" style="height: 77%;"></div>
+                        <small>Jun</small>
+                    </div>
+
+                </div>
+
+                <div class="mini-stats">
+
+                    <div class="mini-stat">
+                        <strong>3</strong>
+                        <span>Sample Segments</span>
+                    </div>
+
+                    <div class="mini-stat">
+                        <strong>K-Means</strong>
+                        <span>ML Algorithm</span>
+                    </div>
+
+                    <div class="mini-stat">
+                        <strong>AI</strong>
+                        <span>Data Insights</span>
+                    </div>
+
+                </div>
+
+                <div class="segment-legend">
+                    <div class="legend-item">
+                        <span class="legend-dot dot-low"></span>
+                        Low Spending
+                    </div>
+
+                    <div class="legend-item">
+                        <span class="legend-dot dot-medium"></span>
+                        Medium Spending
+                    </div>
+
+                    <div class="legend-item">
+                        <span class="legend-dot dot-high"></span>
+                        High Spending
+                    </div>
+                </div>
+
             </div>
         </div>
 
     </div>
-
 </section>
 
 
 <!-- FEATURES -->
-<section class="section">
 
-    <div class="section-title">
-        <h2>Powerful Customer Insights</h2>
-        <p>
-            Analyze your customer data with simple and effective
-            machine learning tools.
-        </p>
+<section class="section" id="features">
+
+    <div class="container">
+
+        <div class="section-heading">
+            <span class="section-tag">KEY FEATURES</span>
+
+            <h2>
+                Everything You Need for
+                <span class="gradient-text">Customer Insights</span>
+            </h2>
+
+            <p>
+                Explore customer data, discover behavioural patterns,
+                and understand your customer segments through a
+                simple analytics interface.
+            </p>
+        </div>
+
+        <div class="features-grid">
+
+            <article class="feature-card">
+                <div class="feature-icon icon-purple">
+                    <i class="bi bi-cloud-arrow-up"></i>
+                </div>
+
+                <h3>Customer Data Upload</h3>
+
+                <p>
+                    Upload a supported customer CSV file to begin
+                    exploring your dataset and preparing it for analysis.
+                </p>
+            </article>
+
+
+            <article class="feature-card">
+                <div class="feature-icon icon-blue">
+                    <i class="bi bi-diagram-3"></i>
+                </div>
+
+                <h3>K-Means Clustering</h3>
+
+                <p>
+                    Group customers according to selected characteristics
+                    and explore patterns in income and spending behaviour.
+                </p>
+            </article>
+
+
+            <article class="feature-card">
+                <div class="feature-icon icon-green">
+                    <i class="bi bi-person-check"></i>
+                </div>
+
+                <h3>Customer Prediction</h3>
+
+                <p>
+                    Enter customer details and use the configured
+                    clustering model to identify a matching segment.
+                </p>
+            </article>
+
+
+            <article class="feature-card">
+                <div class="feature-icon icon-orange">
+                    <i class="bi bi-search"></i>
+                </div>
+
+                <h3>Search Customers</h3>
+
+                <p>
+                    Find customer records using available search
+                    fields and filters to explore specific groups.
+                </p>
+            </article>
+
+
+            <article class="feature-card">
+                <div class="feature-icon icon-pink">
+                    <i class="bi bi-lightbulb"></i>
+                </div>
+
+                <h3>Customer Insights</h3>
+
+                <p>
+                    Review segment summaries, average spending,
+                    income patterns, and useful recommendations.
+                </p>
+            </article>
+
+
+            <article class="feature-card">
+                <div class="feature-icon icon-cyan">
+                    <i class="bi bi-file-earmark-arrow-down"></i>
+                </div>
+
+                <h3>Export Results</h3>
+
+                <p>
+                    Download available segmentation results for
+                    further analysis, record keeping, or reporting.
+                </p>
+            </article>
+
+        </div>
+
     </div>
-
-    <div class="features">
-
-        <div class="feature">
-            <div class="icon">◉</div>
-            <h3>Customer Analysis</h3>
-            <p>
-                Upload your customer dataset and explore important
-                purchasing and demographic information.
-            </p>
-        </div>
-
-        <div class="feature">
-            <div class="icon">✦</div>
-            <h3>K-Means Clustering</h3>
-            <p>
-                Automatically group customers into meaningful
-                segments based on their behaviour.
-            </p>
-        </div>
-
-        <div class="feature">
-            <div class="icon">⌁</div>
-            <h3>Customer Prediction</h3>
-            <p>
-                Enter customer information and identify the segment
-                that best matches their characteristics.
-            </p>
-        </div>
-
-    </div>
-
 </section>
 
 
 <!-- HOW IT WORKS -->
-<section class="section" style="background:#ffffff;">
 
-    <div class="section-title">
-        <h2>How It Works</h2>
-        <p>
-            Three simple steps to discover useful customer segments.
-        </p>
+<section class="section section-white" id="how-it-works">
+
+    <div class="container">
+
+        <div class="section-heading">
+            <span class="section-tag">HOW IT WORKS</span>
+
+            <h2>Three Simple Steps to Get Started</h2>
+
+            <p>
+                Follow a straightforward workflow to transform
+                customer records into useful segmentation results.
+            </p>
+        </div>
+
+        <div class="steps-grid">
+
+            <article class="step-card">
+                <div class="step-number">01</div>
+
+                <h3>Upload Your Data</h3>
+
+                <p>
+                    Import a supported CSV file containing
+                    the required customer information.
+                </p>
+            </article>
+
+
+            <article class="step-card">
+                <div class="step-number">02</div>
+
+                <h3>Analyze Customers</h3>
+
+                <p>
+                    Apply K-Means clustering to group customers
+                    according to the selected numerical features.
+                </p>
+            </article>
+
+
+            <article class="step-card">
+                <div class="step-number">03</div>
+
+                <h3>Explore the Results</h3>
+
+                <p>
+                    Review segment summaries, search records,
+                    and explore predictions and insights.
+                </p>
+            </article>
+
+        </div>
+
     </div>
-
-    <div class="steps">
-
-        <div class="step">
-            <div class="number">1</div>
-            <h3>Upload Data</h3>
-            <p>
-                Upload your customer dataset to the system.
-            </p>
-        </div>
-
-        <div class="step">
-            <div class="number">2</div>
-            <h3>Apply K-Means</h3>
-            <p>
-                The system analyzes customer characteristics
-                and creates clusters.
-            </p>
-        </div>
-
-        <div class="step">
-            <div class="number">3</div>
-            <h3>View Results</h3>
-            <p>
-                Explore segments, charts and customer predictions.
-            </p>
-        </div>
-
-    </div>
-
 </section>
 
 
+<!-- CALL TO ACTION -->
+
+<section class="cta-section">
+    <div class="container">
+
+        <div class="cta-box">
+
+            <h2>Ready to Explore Your Customer Data?</h2>
+
+            <p>
+                Sign in to access the customer segmentation application
+                and begin exploring your available analysis tools.
+            </p>
+
+            <a href="{{ url_for('login') }}" class="button">
+                Open Dashboard
+                <i class="bi bi-arrow-right"></i>
+            </a>
+
+        </div>
+
+    </div>
+</section>
+
+</main>
+
+
 <!-- FOOTER -->
+
 <footer>
-    © 2026 <strong>Customer Segmentation System</strong>
-    · K-Means Machine Learning Project
+    <div class="container">
+
+        <div class="footer-main">
+
+            <div>
+                <div class="footer-brand">
+                    Customer <span>Segmentation</span>
+                </div>
+
+                <p class="footer-description">
+                    An academic machine learning project using K-Means clustering.
+                </p>
+            </div>
+
+            <div class="footer-links">
+                <a href="{{ url_for('home') }}">Home</a>
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="{{ url_for('login') }}">Login</a>
+                <a href="{{ url_for('register') }}">Register</a>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            <span>
+                &copy; 2026 Customer Segmentation System
+            </span>
+
+            <span>
+                Built with Flask, Python and Machine Learning
+            </span>
+        </div>
+
+    </div>
 </footer>
+
+
+<!-- MOBILE MENU -->
+
+<script>
+    const menuToggle = document.getElementById("menuToggle");
+    const navLinks = document.getElementById("navLinks");
+
+    menuToggle.addEventListener("click", function () {
+        const isOpen = navLinks.classList.toggle("open");
+
+        menuToggle.setAttribute("aria-expanded", String(isOpen));
+
+        menuToggle.innerHTML = isOpen
+            ? '<i class="bi bi-x-lg"></i>'
+            : '<i class="bi bi-list"></i>';
+    });
+
+    // Close the mobile menu after clicking a navigation link
+    navLinks.querySelectorAll("a").forEach(function (link) {
+        link.addEventListener("click", function () {
+            navLinks.classList.remove("open");
+            menuToggle.setAttribute("aria-expanded", "false");
+            menuToggle.innerHTML = '<i class="bi bi-list"></i>';
+        });
+    });
+</script>
 
 </body>
 </html>
+```
