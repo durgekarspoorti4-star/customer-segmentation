@@ -9,7 +9,14 @@ import os
 import json
 
 app = Flask(__name__)
-app.secret_key = "customer-segmentation-secret-key"
+
+app.secret_key = os.environ.get("SECRET_KEY")
+
+app.config.update(
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_SECURE=True
+)
 
 # === RENDER PATH FIX ===
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
