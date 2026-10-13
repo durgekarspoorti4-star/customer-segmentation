@@ -1,0 +1,135 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Customer Insights | Customer Segmentation</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <style>
+        body {
+            background: #f4f6fb;
+            font-family: Arial, sans-serif;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 28px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+        }
+
+        .recommendation {
+            border-left: 5px solid #667eea;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container py-4">
+
+    <div class="header">
+        <h2>Customer Insights &amp; Recommendations</h2>
+        <p class="mb-0">
+            Understand customer behavior and explore potential marketing strategies.
+        </p>
+    </div>
+
+    <div class="mb-4">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">
+            Dashboard
+        </a>
+
+        <a href="{{ url_for('results') }}" class="btn btn-primary">
+            Segmentation Results
+        </a>
+
+        <a href="{{ url_for('prediction') }}" class="btn btn-success">
+            Customer Prediction
+        </a>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="card p-4">
+                <h6>Total Customers Analyzed</h6>
+                <h2>{{ total_customers }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card p-4">
+                <h6>Customer Segments</h6>
+                <h2>{{ total_segments }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="card p-4 mb-4">
+        <h4>Segment Summary</h4>
+        <p class="text-muted">
+            Income is shown in the dataset's k$ units.
+        </p>
+
+        <div class="table-responsive">
+            {{ summary_table|safe }}
+        </div>
+    </div>
+
+    <h4 class="mb-3">Marketing Recommendations</h4>
+
+    <div class="row g-3">
+        {% for item in insights_list %}
+        <div class="col-md-6">
+            <div class="card recommendation p-4 h-100">
+                <h5>{{ item.segment }}</h5>
+
+                <p>
+                    <strong>Customers:</strong>
+                    {{ item.customers }}
+                </p>
+
+                <p>
+                    <strong>Average Income:</strong>
+                    {{ item.income }} k$
+                </p>
+
+                <p>
+                    <strong>Average Spending Score:</strong>
+                    {{ item.spending }}
+                </p>
+
+                <hr>
+
+                <h6>Suggested Strategy</h6>
+                <p class="mb-0">{{ item.recommendation }}</p>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                No customer insights are available yet. Run K-Means and generate segmentation results first.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <p class="text-muted mt-4">
+        Note: Recommendations are general suggestions based on spending
+        segments, not guaranteed predictions of customer behavior.
+    </p>
+
+</div>
+</body>
+</html>
