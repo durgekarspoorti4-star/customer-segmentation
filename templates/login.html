@@ -1,69 +1,529 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Login - Customer Segmentation</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <title>Login | Customer Insights</title>
+
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           rel="stylesheet">
 
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
     <style>
-        body {
-            background: #f4f6f9;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .box {
-            width: 420px;
-            margin: 80px auto;
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background: #f6f7ff;
+            color: #171b36;
+        }
+
+        /* Navbar */
+
+        .navbar {
+            padding: 15px 0;
+            background: #ffffff;
+            border-bottom: 1px solid #ececf5;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            font-size: 20px;
+            font-weight: 800;
+            color: #171b36;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            margin-right: 10px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #6558f5, #a855f7);
+            color: white;
+        }
+
+        .back-link {
+            color: #6558f5;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            color: #4338ca;
+        }
+
+        /* Main section */
+
+        .main-wrapper {
+            min-height: calc(100vh - 73px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 15px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 960px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            overflow: hidden;
             background: white;
-            padding: 35px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border-radius: 24px;
+            box-shadow: 0 20px 70px rgba(36, 30, 100, 0.10);
+        }
+
+        /* Welcome panel */
+
+        .welcome-panel {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 50px 42px;
+            color: white;
+            background: linear-gradient(145deg, #5145cd, #8b5cf6);
+        }
+
+        .welcome-panel::before,
+        .welcome-panel::after {
+            content: "";
+            position: absolute;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+        }
+
+        .welcome-panel::before {
+            width: 300px;
+            height: 300px;
+            top: -100px;
+            right: -120px;
+        }
+
+        .welcome-panel::after {
+            width: 220px;
+            height: 220px;
+            bottom: -100px;
+            left: -80px;
+        }
+
+        .welcome-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-badge {
+            display: inline-block;
+            padding: 9px 14px;
+            margin-bottom: 25px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.15);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .welcome-panel h1 {
+            font-size: 34px;
+            font-weight: 800;
+            line-height: 1.35;
+            margin-bottom: 18px;
+        }
+
+        .welcome-panel p {
+            color: #eeeaff;
+            font-size: 14px;
+            line-height: 1.9;
+            margin-bottom: 30px;
+        }
+
+        .benefit {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            margin-bottom: 19px;
+            font-size: 13px;
+        }
+
+        .benefit i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Login form */
+
+        .form-panel {
+            padding: 50px 45px;
+        }
+
+        .form-panel h2 {
+            font-size: 29px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .form-subtitle {
+            color: #777d91;
+            font-size: 13px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 9px;
+            color: #34394f;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .input-wrapper {
+            position: relative;
+            margin-bottom: 22px;
+        }
+
+        .input-wrapper > i {
+            position: absolute;
+            top: 17px;
+            left: 15px;
+            color: #898fa5;
+            font-size: 14px;
+        }
+
+        .form-control {
+            height: 49px;
+            padding-left: 43px;
+            padding-right: 45px;
+            border: 1px solid #e1e3ef;
+            border-radius: 10px;
+            background: #fcfcff;
+            font-size: 13px;
+        }
+
+        .form-control:focus {
+            border-color: #8175fa;
+            box-shadow: 0 0 0 3px rgba(101, 88, 245, 0.10);
+            background: white;
+        }
+
+        .password-toggle {
+            position: absolute;
+            top: 13px;
+            right: 14px;
+            padding: 3px;
+            border: none;
+            background: transparent;
+            color: #777d91;
+            cursor: pointer;
+        }
+
+        .login-btn {
+            width: 100%;
+            height: 49px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #6558f5, #8b5cf6);
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+
+        .login-btn:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px rgba(101, 88, 245, 0.25);
+        }
+
+        .message {
+            padding: 12px 14px;
+            border-radius: 9px;
+            margin-bottom: 18px;
+            font-size: 12px;
+        }
+
+        .message.error {
+            background: #fff0f0;
+            color: #bd3030;
+        }
+
+        .register-link {
+            text-align: center;
+            color: #777d91;
+            font-size: 13px;
+            margin-top: 25px;
+        }
+
+        .register-link a {
+            color: #6558f5;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-text {
+            margin-top: 30px;
+            text-align: center;
+            color: #999eb0;
+            font-size: 11px;
+        }
+
+        /* Responsive design */
+
+        @media (max-width: 768px) {
+            .login-container {
+                max-width: 480px;
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-panel {
+                padding: 32px;
+            }
+
+            .welcome-panel h1 {
+                font-size: 28px;
+            }
+
+            .form-panel {
+                padding: 35px 25px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .form-panel {
+                padding: 28px 18px;
+            }
+
+            .navbar-brand {
+                font-size: 16px;
+            }
         }
     </style>
 </head>
 
 <body>
 
-<div class="box">
+    <!-- Navigation -->
 
-    <h2 class="text-center">🔐 Login</h2>
+    <nav class="navbar">
+        <div class="container d-flex justify-content-between align-items-center">
 
-    <p class="text-center text-muted">
-        Customer Segmentation System
-    </p>
+            <a href="{{ url_for('home') }}" class="navbar-brand">
+                <span class="brand-icon">
+                    <i class="fa-solid fa-chart-pie"></i>
+                </span>
 
-    <form method="POST" action="/login">
+                Customer<span style="color:#6558f5;">Insights</span>
+            </a>
 
-        <div class="mb-3">
-            <label>Email</label>
+            <a href="{{ url_for('home') }}" class="back-link">
+                <i class="fa-solid fa-arrow-left me-2"></i>
+                Back to Home
+            </a>
 
-            <input type="email"
-                   name="email"
-                   class="form-control"
-                   required>
+        </div>
+    </nav>
+
+    <!-- Main login section -->
+
+    <main class="main-wrapper">
+
+        <div class="login-container">
+
+            <!-- Welcome panel -->
+
+            <section class="welcome-panel">
+
+                <div class="welcome-content">
+
+                    <div class="welcome-badge">
+                        <i class="fa-solid fa-star me-2"></i>
+                        AI-POWERED CUSTOMER ANALYTICS
+                    </div>
+
+                    <h1>
+                        Welcome Back!
+                        <br>
+                        Your Insights Await.
+                    </h1>
+
+                    <p>
+                        Sign in to explore customer spending patterns,
+                        analyze segments, and discover useful insights
+                        through machine learning.
+                    </p>
+
+                    <div class="benefit">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Analyze customer segments</span>
+                    </div>
+
+                    <div class="benefit">
+                        <i class="fa-solid fa-brain"></i>
+                        <span>Explore AI-powered analytics</span>
+                    </div>
+
+                    <div class="benefit">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Make data-driven decisions</span>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- Login form -->
+
+            <section class="form-panel">
+
+                <h2>Sign In</h2>
+
+                <p class="form-subtitle">
+                    Enter your details to access your account.
+                </p>
+
+                <!-- Flask displays login errors here -->
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, text in messages %}
+                            <div class="message {{ 'error' if category == 'error' else '' }}"
+                                 role="alert">
+                                {{ text }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="{{ url_for('login') }}">
+
+                    <!-- Email -->
+
+                    <div class="input-wrapper">
+
+                        <label for="email" class="form-label">
+                            Email Address
+                        </label>
+
+                        <i class="fa-solid fa-envelope"></i>
+
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            class="form-control"
+                            placeholder="Enter your email address"
+                            autocomplete="email"
+                            required>
+
+                    </div>
+
+                    <!-- Password -->
+
+                    <div class="input-wrapper">
+
+                        <label for="password" class="form-label">
+                            Password
+                        </label>
+
+                        <i class="fa-solid fa-lock"></i>
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="form-control"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required>
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            id="togglePassword"
+                            aria-label="Show password"
+                            aria-controls="password">
+
+                            <i class="fa-solid fa-eye" id="eyeIcon"></i>
+
+                        </button>
+
+                    </div>
+
+                    <!-- Submit -->
+
+                    <button type="submit" class="btn login-btn">
+                        Sign In
+                        <i class="fa-solid fa-arrow-right ms-2"></i>
+                    </button>
+
+                </form>
+
+                <div class="register-link">
+                    Don't have an account?
+                    <a href="{{ url_for('register') }}">Create Account</a>
+                </div>
+
+                <div class="footer-text">
+                    © 2026 Customer Insights | AI Analytics
+                </div>
+
+            </section>
+
         </div>
 
-        <div class="mb-3">
-            <label>Password</label>
+    </main>
 
-            <input type="password"
-                   name="password"
-                   class="form-control"
-                   required>
-        </div>
+    <!-- Password visibility -->
 
-        <button class="btn btn-primary w-100">
-            Login
-        </button>
+    <script>
+        const passwordInput = document.getElementById("password");
+        const togglePassword = document.getElementById("togglePassword");
+        const eyeIcon = document.getElementById("eyeIcon");
 
-    </form>
+        togglePassword.addEventListener("click", function () {
+            const showPassword = passwordInput.type === "password";
 
-    <p class="text-center mt-3">
-        Don't have an account?
-        <a href="/register">Register</a>
-    </p>
+            passwordInput.type = showPassword ? "text" : "password";
 
-</div>
+            eyeIcon.classList.toggle("fa-eye", !showPassword);
+            eyeIcon.classList.toggle("fa-eye-slash", showPassword);
+
+            togglePassword.setAttribute(
+                "aria-label",
+                showPassword ? "Hide password" : "Show password"
+            );
+        });
+    </script>
 
 </body>
 </html>

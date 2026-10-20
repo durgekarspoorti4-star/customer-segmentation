@@ -1,75 +1,444 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Register - Customer Segmentation</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Account | Customer Segmentation</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           rel="stylesheet">
 
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
     <style>
-        body {
-            background: #f4f6f9;
+        * {
+            box-sizing: border-box;
         }
 
-        .box {
-            width: 420px;
-            margin: 80px auto;
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background: #f4f5ff;
+            color: #202344;
+        }
+
+        .navbar {
             background: white;
-            padding: 35px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            padding: 16px 0;
+            border-bottom: 1px solid #e9e9f3;
+        }
+
+        .brand {
+            text-decoration: none;
+            color: #202344;
+            font-size: 21px;
+            font-weight: 800;
+        }
+
+        .brand-icon {
+            display: inline-flex;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #6257ed, #9b5cf6);
+            color: white;
+            margin-right: 8px;
+        }
+
+        .home-link {
+            color: #6558e8;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .main-wrapper {
+            min-height: calc(100vh - 73px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 35px 15px;
+        }
+
+        .register-card {
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr;
+            width: 100%;
+            max-width: 950px;
+            background: white;
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(48, 40, 110, 0.12);
+        }
+
+        .welcome-panel {
+            padding: 45px 35px;
+            color: white;
+            background: linear-gradient(145deg, #5145cd, #9560f6);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .badge-custom {
+            display: inline-block;
+            width: fit-content;
+            padding: 8px 12px;
+            margin-bottom: 22px;
+            border-radius: 25px;
+            background: rgba(255,255,255,0.17);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .welcome-panel h1 {
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 1.35;
+            margin-bottom: 18px;
+        }
+
+        .welcome-panel p {
+            color: #f0edff;
+            font-size: 13px;
+            line-height: 1.9;
+            margin-bottom: 25px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 13px 0;
+            font-size: 13px;
+        }
+
+        .feature i {
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.16);
+        }
+
+        .form-panel {
+            padding: 42px 45px;
+        }
+
+        .form-panel h2 {
+            font-size: 27px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #81859a;
+            font-size: 13px;
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            color: #383d55;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .input-wrap {
+            position: relative;
+            margin-bottom: 18px;
+        }
+
+        .input-wrap > i {
+            position: absolute;
+            left: 14px;
+            top: 15px;
+            color: #9296aa;
+            font-size: 14px;
+        }
+
+        .form-control {
+            height: 46px;
+            padding-left: 42px;
+            border: 1px solid #e0e2ed;
+            border-radius: 10px;
+            background: #fcfcff;
+            font-size: 13px;
+        }
+
+        .form-control:focus {
+            border-color: #8175fa;
+            box-shadow: 0 0 0 3px rgba(101,88,245,0.10);
+        }
+
+        .password-input {
+            padding-right: 43px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 13px;
+            top: 12px;
+            border: none;
+            background: transparent;
+            color: #7d8297;
+            cursor: pointer;
+        }
+
+        .register-btn {
+            width: 100%;
+            height: 48px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #6558f5, #925cf5);
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            transition: 0.2s;
+        }
+
+        .register-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(101,88,245,0.25);
+        }
+
+        .login-text {
+            margin-top: 22px;
+            text-align: center;
+            font-size: 13px;
+            color: #777d91;
+        }
+
+        .login-text a {
+            color: #6558f5;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .message {
+            display: none;
+            padding: 11px 13px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-bottom: 16px;
+        }
+
+        .message.error {
+            display: block;
+            background: #fff0f0;
+            color: #b42318;
+        }
+
+        @media (max-width: 768px) {
+            .register-card {
+                grid-template-columns: 1fr;
+                max-width: 480px;
+            }
+
+            .welcome-panel {
+                padding: 30px;
+            }
+
+            .welcome-panel h1 {
+                font-size: 26px;
+            }
+
+            .form-panel {
+                padding: 32px 25px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .form-panel {
+                padding: 25px 18px;
+            }
         }
     </style>
 </head>
 
 <body>
 
-<div class="box">
+<nav class="navbar">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a href="{{ url_for('home') }}" class="brand">
+            <span class="brand-icon">
+                <i class="fa-solid fa-chart-pie"></i>
+            </span>
+            Customer<span style="color:#6558f5;">Segmentation</span>
+        </a>
 
-    <h2 class="text-center">🤖 Create Account</h2>
+        <a href="{{ url_for('home') }}" class="home-link">
+            <i class="fa-solid fa-arrow-left me-1"></i> Home
+        </a>
+    </div>
+</nav>
 
-    <p class="text-center text-muted">
-        Customer Segmentation System
-    </p>
+<main class="main-wrapper">
+    <div class="register-card">
 
-    <form method="POST" action="/register">
+        <section class="welcome-panel">
+            <div class="badge-custom">
+                <i class="fa-solid fa-sparkles me-1"></i>
+                AI-POWERED ANALYTICS
+            </div>
 
-        <div class="mb-3">
-            <label>Name</label>
-            <input type="text"
-                   name="name"
-                   class="form-control"
-                   required>
-        </div>
+            <h1>Start Your Journey with Customer Insights</h1>
 
-        <div class="mb-3">
-            <label>Email</label>
-            <input type="email"
-                   name="email"
-                   class="form-control"
-                   required>
-        </div>
+            <p>
+                Create your account to explore customer data,
+                understand spending behaviour, and discover
+                meaningful customer segments.
+            </p>
 
-        <div class="mb-3">
-            <label>Password</label>
-            <input type="password"
-                   name="password"
-                   class="form-control"
-                   required>
-        </div>
+            <div class="feature">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Customer segmentation</span>
+            </div>
 
-        <button class="btn btn-primary w-100">
-            Register
-        </button>
+            <div class="feature">
+                <i class="fa-solid fa-brain"></i>
+                <span>Machine learning insights</span>
+            </div>
 
-    </form>
+            <div class="feature">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Spending pattern analysis</span>
+            </div>
+        </section>
 
-    <p class="text-center mt-3">
-        Already have an account?
-        <a href="/login">Login</a>
-    </p>
+        <section class="form-panel">
+            <h2>Create Account</h2>
+            <p class="subtitle">Enter your details to get started.</p>
 
-</div>
+            <div id="message" class="message" role="alert"></div>
+
+            <form id="registerForm"
+                  method="POST"
+                  action="{{ url_for('register') }}">
+
+                <div class="input-wrap">
+                    <label class="form-label" for="name">Full Name</label>
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text"
+                           class="form-control"
+                           id="name"
+                           name="name"
+                           placeholder="Enter your full name"
+                           minlength="2"
+                           maxlength="80"
+                           autocomplete="name"
+                           required>
+                </div>
+
+                <div class="input-wrap">
+                    <label class="form-label" for="email">Email Address</label>
+                    <i class="fa-solid fa-envelope"></i>
+                    <input type="email"
+                           class="form-control"
+                           id="email"
+                           name="email"
+                           placeholder="you@example.com"
+                           maxlength="254"
+                           autocomplete="email"
+                           required>
+                </div>
+
+                <div class="input-wrap">
+                    <label class="form-label" for="password">Password</label>
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password"
+                           class="form-control password-input"
+                           id="password"
+                           name="password"
+                           placeholder="Create a password"
+                           minlength="8"
+                           maxlength="128"
+                           autocomplete="new-password"
+                           required>
+
+                    <button type="button"
+                            class="toggle-password"
+                            onclick="togglePassword('password', 'eye1')"
+                            aria-label="Show password">
+                        <i class="fa-solid fa-eye" id="eye1"></i>
+                    </button>
+                </div>
+
+                <div class="input-wrap">
+                    <label class="form-label" for="confirmPassword">
+                        Confirm Password
+                    </label>
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <input type="password"
+                           class="form-control password-input"
+                           id="confirmPassword"
+                           name="confirmPassword"
+                           placeholder="Enter password again"
+                           minlength="8"
+                           maxlength="128"
+                           autocomplete="new-password"
+                           required>
+
+                    <button type="button"
+                            class="toggle-password"
+                            onclick="togglePassword('confirmPassword', 'eye2')"
+                            aria-label="Show confirm password">
+                        <i class="fa-solid fa-eye" id="eye2"></i>
+                    </button>
+                </div>
+
+                <button type="submit" class="register-btn">
+                    Create Account
+                    <i class="fa-solid fa-arrow-right ms-2"></i>
+                </button>
+            </form>
+
+            <div class="login-text">
+                Already have an account?
+                <a href="{{ url_for('login') }}">Sign In</a>
+            </div>
+        </section>
+
+    </div>
+</main>
+
+<script>
+    function togglePassword(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.replace("fa-eye", "fa-eye-slash");
+        } else {
+            input.type = "password";
+            icon.classList.replace("fa-eye-slash", "fa-eye");
+        }
+    }
+
+    document.getElementById("registerForm").addEventListener("submit", function(event) {
+        const password = document.getElementById("password").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+        const message = document.getElementById("message");
+
+        if (password !== confirmPassword) {
+            event.preventDefault();
+            message.textContent = "Passwords do not match. Please try again.";
+            message.className = "message error";
+        }
+    });
+</script>
 
 </body>
 </html>
