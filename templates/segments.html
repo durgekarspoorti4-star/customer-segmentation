@@ -3,34 +3,35 @@
 
 <head>
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Customer Segments | AI Analytics</title>
+    <title>Customer Segments | Customer Insights</title>
 
     <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
 
     <!-- Font Awesome -->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet">
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        rel="stylesheet"
+    >
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
-            --primary: #6c63ff;
-            --primary-dark: #5145cd;
-            --background: #f5f6fc;
-            --text-dark: #252642;
-            --text-muted: #777b91;
-            --border: #e9eaf2;
-            --sidebar-width: 255px;
+            --primary: #4f46e5;
+            --primary-light: #eef2ff;
+            --sidebar-width: 250px;
+            --background: #f5f7fb;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
         }
 
         * {
@@ -41,21 +42,21 @@
             margin: 0;
             background: var(--background);
             color: var(--text-dark);
-            font-family: 'Inter', sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
         }
 
         /* Sidebar */
 
         .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
             position: fixed;
             top: 0;
             left: 0;
-            width: var(--sidebar-width);
-            height: 100vh;
-            padding: 25px 17px;
-            background: #fff;
-            border-right: 1px solid var(--border);
             z-index: 1000;
+            padding: 24px 16px;
+            background: #ffffff;
+            border-right: 1px solid var(--border);
             overflow-y: auto;
             transition: transform 0.3s ease;
         }
@@ -64,565 +65,472 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 0 10px 30px;
+            padding: 8px 10px 28px;
+            font-size: 19px;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
         }
 
         .brand-icon {
-            width: 44px;
-            height: 44px;
+            width: 42px;
+            height: 42px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 13px;
-            color: #fff;
-            font-size: 20px;
-            background: linear-gradient(135deg, #7768ff, #9b5de5);
+            background: var(--primary);
+            color: white;
         }
 
-        .brand h5 {
-            margin: 0;
-            font-size: 15px;
-            font-weight: 800;
-        }
-
-        .brand small {
-            color: var(--text-muted);
+        .nav-heading {
+            margin: 18px 12px 10px;
+            color: #94a3b8;
             font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
         }
 
-        .menu-title {
-            padding: 12px 13px;
-            color: #a0a2b4;
-            font-size: 10px;
-            font-weight: 800;
-            letter-spacing: 1.4px;
-        }
-
-        .nav-link-custom {
+        .sidebar-link {
             display: flex;
             align-items: center;
-            gap: 13px;
+            gap: 12px;
             padding: 12px 14px;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
             border-radius: 10px;
-            color: #777b91;
+            color: #64748b;
             text-decoration: none;
-            font-size: 12px;
-            font-weight: 600;
-            transition: 0.2s;
+            font-size: 14px;
+            transition: 0.2s ease;
         }
 
-        .nav-link-custom i {
+        .sidebar-link i {
             width: 19px;
             text-align: center;
-            font-size: 15px;
         }
 
-        .nav-link-custom:hover {
-            background: #f2f0ff;
+        .sidebar-link:hover {
             color: var(--primary);
+            background: var(--primary-light);
         }
 
-        .nav-link-custom.active {
-            color: #fff;
-            background: linear-gradient(135deg, #7768ff, #6555e8);
-            box-shadow: 0 6px 15px rgba(108, 99, 255, 0.2);
+        .sidebar-link.active {
+            color: white;
+            background: var(--primary);
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.18);
         }
 
-        .sidebar-note {
-            margin-top: 30px;
-            padding: 15px;
-            background: #f6f5ff;
-            border-radius: 13px;
-        }
-
-        .sidebar-note strong {
-            font-size: 11px;
-        }
-
-        .sidebar-note p {
-            margin: 8px 0 0;
-            color: var(--text-muted);
-            font-size: 10px;
-            line-height: 1.7;
-        }
-
-        /* Main layout */
+        /* Main area */
 
         .main {
             min-height: 100vh;
             margin-left: var(--sidebar-width);
-            padding: 28px 32px;
+            padding: 30px;
         }
 
         .topbar {
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
             gap: 15px;
-            margin-bottom: 25px;
+            margin-bottom: 28px;
         }
 
-        .page-heading h4 {
-            margin: 0 0 5px;
-            font-size: 23px;
+        .page-title {
+            margin: 0;
+            font-size: 28px;
             font-weight: 800;
         }
 
-        .page-heading p {
-            margin: 0;
+        .page-subtitle {
+            margin: 8px 0 0;
             color: var(--text-muted);
-            font-size: 12px;
+            font-size: 14px;
         }
 
-        .user-profile {
+        .user-badge {
+            width: 43px;
+            height: 43px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 8px 13px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            background: #fff;
-        }
-
-        .user-avatar {
-            width: 37px;
-            height: 37px;
-            display: flex;
             justify-content: center;
-            align-items: center;
-            border-radius: 11px;
-            background: #eceaff;
-            color: var(--primary);
-        }
-
-        .user-profile strong {
-            display: block;
-            font-size: 12px;
-        }
-
-        .user-profile small {
-            color: var(--text-muted);
-            font-size: 10px;
-        }
-
-        .mobile-toggle {
-            display: none;
-            padding: 9px 12px;
-            border: none;
-            border-radius: 9px;
-            background: #fff;
-            color: var(--primary);
-            font-size: 18px;
-        }
-
-        /* Hero */
-
-        .hero {
-            position: relative;
-            overflow: hidden;
-            padding: 30px;
-            margin-bottom: 25px;
-            color: #fff;
-            border-radius: 20px;
-            background: linear-gradient(120deg, #6558e8, #8e61d5, #a36ad8);
-            box-shadow: 0 12px 30px rgba(108, 99, 255, 0.16);
-        }
-
-        .hero::after {
-            content: "";
-            position: absolute;
-            top: -85px;
-            right: -55px;
-            width: 220px;
-            height: 220px;
-            border: 35px solid rgba(255, 255, 255, 0.09);
             border-radius: 50%;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 17px;
         }
 
-        .hero-content {
-            position: relative;
-            z-index: 1;
-        }
-
-        .hero-label {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 7px 12px;
-            border-radius: 30px;
-            background: rgba(255, 255, 255, 0.16);
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 0.8px;
-            text-transform: uppercase;
-        }
-
-        .hero h2 {
-            margin: 15px 0 9px;
-            font-size: clamp(24px, 3vw, 31px);
-            font-weight: 800;
-        }
-
-        .hero p {
-            max-width: 650px;
-            margin: 0;
-            color: rgba(255, 255, 255, 0.88);
-            font-size: 13px;
-            line-height: 1.8;
-        }
-
-        /* General cards */
-
-        .content-card {
-            height: 100%;
-            padding: 24px;
-            background: #fff;
+        .mobile-menu {
+            display: none;
+            width: 42px;
+            height: 42px;
             border: 1px solid var(--border);
-            border-radius: 16px;
-            box-shadow: 0 4px 18px rgba(40, 42, 80, 0.025);
+            border-radius: 10px;
+            background: white;
+            color: var(--text-dark);
         }
 
-        .section-heading {
-            margin-bottom: 20px;
-        }
+        /* Summary cards */
 
-        .section-heading h5 {
-            margin: 0 0 5px;
-            font-size: 15px;
-            font-weight: 800;
-        }
-
-        .section-heading p {
-            margin: 0;
-            color: var(--text-muted);
-            font-size: 11px;
-            line-height: 1.7;
-        }
-
-        /* Segment cards */
-
-        .segment-card {
+        .summary-card {
             position: relative;
             height: 100%;
-            overflow: hidden;
-            padding: 24px;
+            padding: 23px;
+            background: white;
             border: 1px solid var(--border);
             border-radius: 17px;
-            background: #fff;
-            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.025);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .segment-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 28px rgba(35, 35, 75, 0.08);
+        .summary-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.07);
         }
 
-        .segment-top {
+        .card-heading {
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 12px;
         }
 
-        .segment-icon {
-            width: 52px;
-            height: 52px;
+        .card-label {
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .card-icon {
+            width: 45px;
+            height: 45px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 15px;
-            font-size: 21px;
+            border-radius: 13px;
+            font-size: 18px;
         }
 
-        .low .segment-icon {
-            color: #d97706;
-            background: #fff2dc;
+        .icon-purple {
+            background: #eef2ff;
+            color: #4f46e5;
         }
 
-        .medium .segment-icon {
-            color: #2878d0;
-            background: #e7f2ff;
+        .icon-green {
+            background: #dcfce7;
+            color: #15803d;
         }
 
-        .high .segment-icon {
-            color: #15966a;
-            background: #e2f8ed;
+        .icon-yellow {
+            background: #fef3c7;
+            color: #b45309;
         }
 
-        .segment-tag {
-            padding: 6px 9px;
-            border-radius: 30px;
-            font-size: 9px;
-            font-weight: 800;
+        .icon-red {
+            background: #fee2e2;
+            color: #dc2626;
         }
 
-        .low .segment-tag {
-            background: #fff2dc;
-            color: #b86c0c;
-        }
-
-        .medium .segment-tag {
-            background: #e7f2ff;
-            color: #2878d0;
-        }
-
-        .high .segment-tag {
-            background: #e2f8ed;
-            color: #15966a;
-        }
-
-        .segment-card h5 {
-            margin: 20px 0 7px;
-            font-size: 15px;
-            font-weight: 800;
-        }
-
-        .segment-description {
-            min-height: 35px;
-            margin-bottom: 17px;
-            color: var(--text-muted);
-            font-size: 11px;
-            line-height: 1.7;
-        }
-
-        .segment-number {
-            margin-bottom: 4px;
-            font-size: 36px;
+        .card-number {
+            margin-top: 22px;
+            font-size: 32px;
             font-weight: 800;
             letter-spacing: -1px;
-            overflow-wrap: anywhere;
         }
 
-        .segment-number-label {
+        .card-description {
+            margin-top: 6px;
             color: var(--text-muted);
-            font-size: 11px;
+            font-size: 12px;
+        }
+
+        /* Content panels */
+
+        .panel {
+            height: 100%;
+            padding: 24px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.025);
+        }
+
+        .panel-title {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 750;
+        }
+
+        .panel-subtitle {
+            margin: 7px 0 0;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            max-width: 340px;
+            height: 280px;
+            margin: 22px auto 0;
+        }
+
+        .segment-row {
+            margin-top: 25px;
+        }
+
+        .segment-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 9px;
+            font-size: 13px;
+        }
+
+        .segment-name {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-weight: 650;
+        }
+
+        .segment-dot {
+            width: 10px;
+            height: 10px;
+            display: inline-block;
+            border-radius: 50%;
+        }
+
+        .dot-low {
+            background: #f59e0b;
+        }
+
+        .dot-medium {
+            background: #6366f1;
+        }
+
+        .dot-high {
+            background: #10b981;
         }
 
         .progress {
-            height: 7px;
-            margin-top: 18px;
-            background: #eff0f6;
+            height: 8px;
+            background: #f1f5f9;
             border-radius: 20px;
         }
 
         .progress-bar {
             border-radius: 20px;
-            transition: width 0.4s ease;
         }
 
-        .low .progress-bar {
-            background: #f0a43a;
+        .progress-low {
+            background: #f59e0b;
         }
 
-        .medium .progress-bar {
-            background: #4289e8;
+        .progress-medium {
+            background: #6366f1;
         }
 
-        .high .progress-bar {
-            background: #23b47e;
+        .progress-high {
+            background: #10b981;
         }
 
-        .percentage-label {
+        /* Customer table */
+
+        .table-panel {
+            margin-top: 24px;
+        }
+
+        .table-toolbar {
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            gap: 10px;
-            margin-top: 9px;
-            color: var(--text-muted);
-            font-size: 10px;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 22px 0;
         }
 
-        /* Buttons */
-
-        .btn {
-            min-height: 40px;
-            padding: 10px 15px;
-            border-radius: 9px;
-            font-size: 11px;
-            font-weight: 700;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            border-color: var(--primary);
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            border-color: var(--primary-dark);
-        }
-
-        /* Chart */
-
-        .chart-container {
+        .search-box {
             position: relative;
-            height: 285px;
-            width: 100%;
+            width: min(100%, 330px);
         }
 
-        .chart-legend-note {
-            margin-top: 12px;
-            color: var(--text-muted);
-            font-size: 10px;
-            line-height: 1.7;
-        }
-
-        /* Table */
-
-        .table-search {
-            position: relative;
-            width: min(100%, 280px);
-        }
-
-        .table-search i {
+        .search-box i {
             position: absolute;
-            left: 13px;
-            top: 15px;
-            color: #a0a2b4;
-            font-size: 12px;
+            top: 50%;
+            left: 14px;
+            color: #94a3b8;
+            transform: translateY(-50%);
         }
 
-        .table-search input {
-            min-height: 42px;
-            padding-left: 35px;
-            border: 1px solid #e4e5ef;
+        .search-input {
+            width: 100%;
+            padding: 11px 13px 11px 40px;
+            border: 1px solid var(--border);
             border-radius: 10px;
-            font-size: 12px;
-            box-shadow: none;
+            outline: none;
+            font-size: 13px;
         }
 
-        .table-search input:focus {
+        .search-input:focus {
             border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.08);
+        }
+
+        .btn-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 16px;
+            border: none;
+            border-radius: 10px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 650;
+            transition: background 0.2s ease;
+        }
+
+        .btn-download:hover {
+            background: #4338ca;
+            color: white;
         }
 
         .table-responsive {
-            max-height: 500px;
-            overflow: auto;
             border: 1px solid var(--border);
             border-radius: 12px;
         }
 
         .table {
             margin-bottom: 0;
-            vertical-align: middle;
-            font-size: 12px;
+            font-size: 13px;
+            white-space: nowrap;
         }
 
         .table thead th {
-            position: sticky;
-            top: 0;
-            z-index: 2;
-            padding: 14px;
-            background: #f6f5ff;
-            color: #595b78;
-            border-bottom: 1px solid #e9e7ff;
-            white-space: nowrap;
+            padding: 15px;
+            background: #f8fafc;
+            color: #64748b;
             font-size: 11px;
+            font-weight: 750;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
         }
 
         .table tbody td {
-            padding: 13px 14px;
-            color: #555871;
-            white-space: nowrap;
+            padding: 13px 15px;
+            vertical-align: middle;
         }
 
         .table tbody tr:hover td {
-            background: #faf9ff;
+            background: #fafbff;
         }
 
-        .table tbody tr:last-child td {
-            border-bottom: none;
+        .segment-badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 700;
         }
 
-        .empty-state {
+        .badge-low {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-medium {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .badge-high {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-other {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        .empty-message {
             display: none;
-            padding: 35px 15px;
+            padding: 28px;
             text-align: center;
             color: var(--text-muted);
-            font-size: 12px;
-        }
-
-        .empty-state i {
-            display: block;
-            margin-bottom: 12px;
-            color: #aaa3e9;
-            font-size: 30px;
-        }
-
-        .table-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 17px;
-        }
-
-        .table-footer small {
-            color: var(--text-muted);
-            font-size: 11px;
+            font-size: 14px;
         }
 
         .footer {
-            padding-top: 25px;
+            padding: 25px 0 5px;
             text-align: center;
-            color: #9294a8;
-            font-size: 10px;
+            color: #94a3b8;
+            font-size: 12px;
         }
 
-        @media (max-width: 1100px) {
+        /* Responsive */
+
+        @media (max-width: 991px) {
             .sidebar {
                 transform: translateX(-100%);
             }
 
-            .sidebar.open {
+            .sidebar.show {
                 transform: translateX(0);
-                box-shadow: 10px 0 30px rgba(20, 20, 50, 0.12);
+                box-shadow: 10px 0 30px rgba(15, 23, 42, 0.12);
             }
 
             .main {
                 margin-left: 0;
-                padding: 24px 20px;
+                padding: 22px;
             }
 
-            .mobile-toggle {
+            .mobile-menu {
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
             }
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 575px) {
             .main {
-                padding: 17px 12px;
+                padding: 16px;
             }
 
-            .page-heading h4 {
-                font-size: 18px;
+            .page-title {
+                font-size: 22px;
             }
 
-            .page-heading p {
-                font-size: 10px;
+            .topbar {
+                align-items: flex-start;
             }
 
-            .user-profile .user-info {
-                display: none;
-            }
-
-            .hero {
-                padding: 23px 20px;
-            }
-
-            .content-card {
+            .summary-card {
                 padding: 18px;
             }
 
-            .segment-card {
-                padding: 20px;
+            .card-number {
+                font-size: 27px;
             }
 
-            .chart-container {
-                height: 250px;
+            .panel {
+                padding: 18px;
+            }
+
+            .table-toolbar {
+                align-items: stretch;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .btn-download {
+                justify-content: center;
             }
         }
     </style>
@@ -630,651 +538,636 @@
 
 <body>
 
-<!-- Sidebar -->
-<aside class="sidebar" id="sidebar">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
 
-    <div class="brand">
-        <div class="brand-icon">
-            <i class="fa-solid fa-chart-pie"></i>
-        </div>
+        <a href="{{ url_for('index') }}" class="brand">
+            <span class="brand-icon">
+                <i class="fa-solid fa-chart-pie"></i>
+            </span>
 
-        <div>
-            <h5>Customer Insights</h5>
-            <small>AI Analytics Platform</small>
-        </div>
-    </div>
+            <span>Customer Insights</span>
+        </a>
 
-    <div class="menu-title">MAIN MENU</div>
+        <div class="nav-heading">Workspace</div>
 
-    <a href="{{ url_for('index') }}" class="nav-link-custom">
-        <i class="fa-solid fa-house"></i>
-        Dashboard
-    </a>
+        <a href="{{ url_for('index') }}" class="sidebar-link">
+            <i class="fa-solid fa-house"></i>
+            <span>Dashboard</span>
+        </a>
 
-    <a href="{{ url_for('analysis') }}" class="nav-link-custom">
-        <i class="fa-solid fa-database"></i>
-        Data Analysis
-    </a>
+        <a href="{{ url_for('upload') }}" class="sidebar-link">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <span>Upload Dataset</span>
+        </a>
 
-    <a href="{{ url_for('upload') }}" class="nav-link-custom">
-        <i class="fa-solid fa-cloud-arrow-up"></i>
-        Upload Dataset
-    </a>
+        <a href="{{ url_for('analysis') }}" class="sidebar-link">
+            <i class="fa-solid fa-magnifying-glass-chart"></i>
+            <span>Data Analysis</span>
+        </a>
 
-    <a href="{{ url_for('kmeans_page') }}" class="nav-link-custom">
-        <i class="fa-solid fa-diagram-project"></i>
-        K-Means Clustering
-    </a>
+        <a href="{{ url_for('kmeans_page') }}" class="sidebar-link">
+            <i class="fa-solid fa-diagram-project"></i>
+            <span>K-Means Clustering</span>
+        </a>
 
-    <a href="{{ url_for('results') }}" class="nav-link-custom">
-        <i class="fa-solid fa-chart-column"></i>
-        Clustering Results
-    </a>
+        <a href="{{ url_for('results') }}" class="sidebar-link">
+            <i class="fa-solid fa-chart-column"></i>
+            <span>Clustering Results</span>
+        </a>
 
-    <a href="{{ url_for('segments') }}"
-       class="nav-link-custom active"
-       aria-current="page">
-        <i class="fa-solid fa-users"></i>
-        Customer Segments
-    </a>
+        <a href="{{ url_for('segments') }}" class="sidebar-link active">
+            <i class="fa-solid fa-users"></i>
+            <span>Customer Segments</span>
+        </a>
 
-    <a href="{{ url_for('prediction') }}" class="nav-link-custom">
-        <i class="fa-solid fa-wand-magic-sparkles"></i>
-        Prediction
-    </a>
+        <a href="{{ url_for('prediction') }}" class="sidebar-link">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>Prediction</span>
+        </a>
 
-    <a href="{{ url_for('search_customers') }}" class="nav-link-custom">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        Search Customers
-    </a>
+        <div class="nav-heading">Account</div>
 
-    <a href="{{ url_for('insights') }}" class="nav-link-custom">
-        <i class="fa-solid fa-lightbulb"></i>
-        Business Insights
-    </a>
+        <a href="{{ url_for('logout') }}" class="sidebar-link">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+        </a>
 
-    <div class="menu-title mt-3">ACCOUNT</div>
+    </aside>
 
-    <a href="{{ url_for('logout') }}" class="nav-link-custom">
-        <i class="fa-solid fa-right-from-bracket"></i>
-        Logout
-    </a>
 
-    <div class="sidebar-note">
-        <div class="d-flex align-items-center gap-2">
-            <i class="fa-solid fa-circle-info text-primary"></i>
-            <strong>About Segments</strong>
-        </div>
+    <!-- Main content -->
+    <main class="main">
 
-        <p>
-            Customers are grouped by their purchasing behaviour using
-            K-Means clustering on annual income and spending score.
-        </p>
-    </div>
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div
+                        class="alert alert-{{ category }} alert-dismissible fade show"
+                        role="alert"
+                    >
+                        <i class="fa-solid fa-circle-info me-2"></i>
 
-</aside>
+                        {{ message }}
 
-<!-- Main Content -->
-<main class="main">
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Close"
+                        ></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
-    <!-- Topbar -->
-    <header class="topbar">
 
-        <div class="d-flex align-items-center gap-3">
+        <!-- Header -->
+        <header class="topbar">
 
-            <button class="mobile-toggle"
-                    id="menuToggle"
+            <div class="d-flex align-items-start gap-3">
+
+                <button
                     type="button"
+                    class="mobile-menu"
+                    id="menuButton"
                     aria-label="Toggle navigation"
-                    aria-expanded="false">
-                <i class="fa-solid fa-bars"></i>
-            </button>
+                >
+                    <i class="fa-solid fa-bars"></i>
+                </button>
 
-            <div class="page-heading">
-                <h4>Customer Segments</h4>
-                <p>Understand your customer groups at a glance.</p>
+                <div>
+                    <h1 class="page-title">Customer Segments</h1>
+
+                    <p class="page-subtitle">
+                        Understand your customers through spending behavior
+                        and K-Means clustering.
+                    </p>
+                </div>
+
             </div>
 
-        </div>
-
-        <div class="user-profile">
-            <div class="user-avatar">
+            <div class="user-badge" title="Customer Insights">
                 <i class="fa-solid fa-user"></i>
             </div>
 
-            <div class="user-info">
-                <strong>{{ session.get('user', 'User') }}</strong>
-                <small>Project Workspace</small>
-            </div>
-        </div>
+        </header>
 
-    </header>
 
-    <!-- Hero -->
-    <section class="hero">
+        <!-- Summary cards -->
+        <section class="row g-4">
 
-        <div class="hero-content">
+            <!-- Total customers -->
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="summary-card">
 
-            <span class="hero-label">
-                <i class="fa-solid fa-users"></i>
-                Customer Segmentation
-            </span>
+                    <div class="card-heading">
+                        <span class="card-label">Total Customers</span>
 
-            <h2>Know Your Customer Groups</h2>
-
-            <p>
-                Explore low, medium, and high spending customer groups.
-                Review the distribution of customers and inspect individual
-                records to better understand purchasing behaviour.
-            </p>
-
-        </div>
-
-    </section>
-
-    <!-- Segment Cards -->
-    <section class="row g-3 mb-4">
-
-        <!-- Low Spending -->
-        <div class="col-12 col-md-6 col-xl-4">
-
-            <div class="segment-card low">
-
-                <div class="segment-top">
-
-                    <div class="segment-icon">
-                        <i class="fa-solid fa-arrow-trend-down"></i>
+                        <span class="card-icon icon-purple">
+                            <i class="fa-solid fa-users"></i>
+                        </span>
                     </div>
 
-                    <span class="segment-tag">LOW SPENDING</span>
+                    <div class="card-number">
+                        {{ total_customers }}
+                    </div>
+
+                    <div class="card-description">
+                        Customers included in clustering results
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- Low spending -->
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="summary-card">
+
+                    <div class="card-heading">
+                        <span class="card-label">Low Spending</span>
+
+                        <span class="card-icon icon-yellow">
+                            <i class="fa-solid fa-arrow-trend-down"></i>
+                        </span>
+                    </div>
+
+                    <div class="card-number">
+                        {{ low_count }}
+                    </div>
+
+                    <div class="card-description">
+                        Customers in the lowest-spending cluster
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- Medium spending -->
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="summary-card">
+
+                    <div class="card-heading">
+                        <span class="card-label">Medium Spending</span>
+
+                        <span class="card-icon icon-purple">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </span>
+                    </div>
+
+                    <div class="card-number">
+                        {{ medium_count }}
+                    </div>
+
+                    <div class="card-description">
+                        Customers in the middle-spending cluster
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- High spending -->
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="summary-card">
+
+                    <div class="card-heading">
+                        <span class="card-label">High Spending</span>
+
+                        <span class="card-icon icon-green">
+                            <i class="fa-solid fa-arrow-trend-up"></i>
+                        </span>
+                    </div>
+
+                    <div class="card-number">
+                        {{ high_count }}
+                    </div>
+
+                    <div class="card-description">
+                        Customers in the highest-spending cluster
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- Chart and segment distribution -->
+        <section class="row g-4 mt-1">
+
+            <!-- Doughnut chart -->
+            <div class="col-12 col-lg-6">
+
+                <div class="panel">
+
+                    <h2 class="panel-title">Segment Distribution</h2>
+
+                    <p class="panel-subtitle">
+                        Customer distribution across the generated clusters.
+                    </p>
+
+                    <div class="chart-wrapper">
+                        <canvas
+                            id="segmentChart"
+                            aria-label="Customer segment distribution chart"
+                            role="img"
+                        ></canvas>
+                    </div>
 
                 </div>
 
-                <h5>Low Spending</h5>
+            </div>
 
-                <p class="segment-description">
-                    Customers with relatively lower spending scores.
+
+            <!-- Segment percentages -->
+            <div class="col-12 col-lg-6">
+
+                <div class="panel">
+
+                    <h2 class="panel-title">Segment Overview</h2>
+
+                    <p class="panel-subtitle">
+                        Percentage of customers in each spending segment.
+                    </p>
+
+
+                    <!-- Low -->
+                    <div class="segment-row">
+
+                        <div class="segment-info">
+                            <span class="segment-name">
+                                <span class="segment-dot dot-low"></span>
+                                Low Spending
+                            </span>
+
+                            <strong>
+                                {{ low_count }}
+                            </strong>
+                        </div>
+
+                        <div class="progress">
+                            <div
+                                class="progress-bar progress-low"
+                                role="progressbar"
+                                style="width: {{ (low_count / total_customers * 100) if total_customers else 0 }}%;"
+                                aria-valuenow="{{ (low_count / total_customers * 100) if total_customers else 0 }}"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                            ></div>
+                        </div>
+
+                        <div class="card-description mt-2">
+                            {{ "%.1f"|format((low_count / total_customers * 100) if total_customers else 0) }}%
+                            of all customers
+                        </div>
+
+                    </div>
+
+
+                    <!-- Medium -->
+                    <div class="segment-row">
+
+                        <div class="segment-info">
+                            <span class="segment-name">
+                                <span class="segment-dot dot-medium"></span>
+                                Medium Spending
+                            </span>
+
+                            <strong>
+                                {{ medium_count }}
+                            </strong>
+                        </div>
+
+                        <div class="progress">
+                            <div
+                                class="progress-bar progress-medium"
+                                role="progressbar"
+                                style="width: {{ (medium_count / total_customers * 100) if total_customers else 0 }}%;"
+                                aria-valuenow="{{ (medium_count / total_customers * 100) if total_customers else 0 }}"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                            ></div>
+                        </div>
+
+                        <div class="card-description mt-2">
+                            {{ "%.1f"|format((medium_count / total_customers * 100) if total_customers else 0) }}%
+                            of all customers
+                        </div>
+
+                    </div>
+
+
+                    <!-- High -->
+                    <div class="segment-row">
+
+                        <div class="segment-info">
+                            <span class="segment-name">
+                                <span class="segment-dot dot-high"></span>
+                                High Spending
+                            </span>
+
+                            <strong>
+                                {{ high_count }}
+                            </strong>
+                        </div>
+
+                        <div class="progress">
+                            <div
+                                class="progress-bar progress-high"
+                                role="progressbar"
+                                style="width: {{ (high_count / total_customers * 100) if total_customers else 0 }}%;"
+                                aria-valuenow="{{ (high_count / total_customers * 100) if total_customers else 0 }}"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                            ></div>
+                        </div>
+
+                        <div class="card-description mt-2">
+                            {{ "%.1f"|format((high_count / total_customers * 100) if total_customers else 0) }}%
+                            of all customers
+                        </div>
+
+                    </div>
+
+
+                    {% if not segment_counts or
+                          "Low Spending" not in segment_counts or
+                          "Medium Spending" not in segment_counts or
+                          "High Spending" not in segment_counts %}
+
+                        <div class="alert alert-info mt-4 mb-0 small">
+                            <i class="fa-solid fa-circle-info me-1"></i>
+
+                            Low, Medium, and High Spending cards are intended
+                            for a three-cluster model. If you selected a
+                            different number of clusters, the chart shows the
+                            actual generated groups.
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Customer table -->
+        <section class="panel table-panel">
+
+            <div>
+                <h2 class="panel-title">Customer Records</h2>
+
+                <p class="panel-subtitle">
+                    Search customers and review their assigned segments.
                 </p>
+            </div>
 
-                <div class="segment-number">{{ low_count | default(0) }}</div>
 
-                <div class="segment-number-label">
-                    Customers in this segment
+            <div class="table-toolbar">
+
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        type="search"
+                        id="customerSearch"
+                        class="search-input"
+                        placeholder="Search customer records..."
+                        aria-label="Search customer records"
+                    >
                 </div>
 
-                <div class="progress">
-                    <div class="progress-bar"
-                         id="lowProgress"
-                         role="progressbar"
-                         aria-label="Low spending customer percentage"
-                         style="width: 0%">
-                    </div>
-                </div>
-
-                <div class="percentage-label">
-                    <span>Share of customers</span>
-                    <strong id="lowPercentage">0%</strong>
-                </div>
+                <a
+                    href="{{ url_for('download') }}"
+                    class="btn-download"
+                >
+                    <i class="fa-solid fa-download"></i>
+                    Download CSV
+                </a>
 
             </div>
 
-        </div>
 
-        <!-- Medium Spending -->
-        <div class="col-12 col-md-6 col-xl-4">
+            <div class="table-responsive">
 
-            <div class="segment-card medium">
-
-                <div class="segment-top">
-
-                    <div class="segment-icon">
-                        <i class="fa-solid fa-chart-simple"></i>
-                    </div>
-
-                    <span class="segment-tag">MEDIUM SPENDING</span>
-
+                <div id="customerTable">
+                    {{ customer_table | safe }}
                 </div>
 
-                <h5>Medium Spending</h5>
+                <div class="empty-message" id="emptyMessage">
+                    <i class="fa-solid fa-magnifying-glass mb-2"></i>
 
-                <p class="segment-description">
-                    Customers with moderate spending scores.
-                </p>
-
-                <div class="segment-number">{{ medium_count | default(0) }}</div>
-
-                <div class="segment-number-label">
-                    Customers in this segment
-                </div>
-
-                <div class="progress">
-                    <div class="progress-bar"
-                         id="mediumProgress"
-                         role="progressbar"
-                         aria-label="Medium spending customer percentage"
-                         style="width: 0%">
-                    </div>
-                </div>
-
-                <div class="percentage-label">
-                    <span>Share of customers</span>
-                    <strong id="mediumPercentage">0%</strong>
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- High Spending -->
-        <div class="col-12 col-md-6 col-xl-4">
-
-            <div class="segment-card high">
-
-                <div class="segment-top">
-
-                    <div class="segment-icon">
-                        <i class="fa-solid fa-arrow-trend-up"></i>
-                    </div>
-
-                    <span class="segment-tag">HIGH SPENDING</span>
-
-                </div>
-
-                <h5>High Spending</h5>
-
-                <p class="segment-description">
-                    Customers with relatively higher spending scores.
-                </p>
-
-                <div class="segment-number">{{ high_count | default(0) }}</div>
-
-                <div class="segment-number-label">
-                    Customers in this segment
-                </div>
-
-                <div class="progress">
-                    <div class="progress-bar"
-                         id="highProgress"
-                         role="progressbar"
-                         aria-label="High spending customer percentage"
-                         style="width: 0%">
-                    </div>
-                </div>
-
-                <div class="percentage-label">
-                    <span>Share of customers</span>
-                    <strong id="highPercentage">0%</strong>
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-    <!-- Chart and Overview -->
-    <section class="row g-4 mb-4">
-
-        <div class="col-12 col-xl-7">
-
-            <div class="content-card">
-
-                <div class="section-heading">
-                    <h5>
-                        <i class="fa-solid fa-chart-pie text-primary me-2"></i>
-                        Customer Distribution
-                    </h5>
-
-                    <p>
-                        Compare the number of customers in each spending group.
+                    <p class="mb-0">
+                        No matching customer records found.
                     </p>
                 </div>
 
-                <div class="chart-container">
-                    <canvas id="segmentChart"
-                            aria-label="Customer distribution by spending segment"
-                            role="img">
-                    </canvas>
-                </div>
-
-                <p class="chart-legend-note">
-                    <i class="fa-solid fa-circle-info me-1"></i>
-                    The chart uses the segment counts returned by your Flask
-                    application.
-                </p>
-
             </div>
 
-        </div>
+        </section>
 
-        <div class="col-12 col-xl-5">
 
-            <div class="content-card">
+        <!-- Footer -->
+        <footer class="footer">
+            Customer Insights &copy; {{ 2026 }} |
+            AI-Powered Customer Segmentation
+        </footer>
 
-                <div class="section-heading">
-                    <h5>
-                        <i class="fa-solid fa-lightbulb text-warning me-2"></i>
-                        Understanding the Segments
-                    </h5>
+    </main>
 
-                    <p>
-                        Use these groups to explore customer behaviour.
-                    </p>
-                </div>
 
-                <div class="d-flex gap-3 mb-4">
-                    <div class="segment-icon"
-                         style="background:#fff2dc;color:#d97706;flex-shrink:0;">
-                        <i class="fa-solid fa-arrow-trend-down"></i>
-                    </div>
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-                    <div>
-                        <strong style="font-size:12px;">Low Spending</strong>
 
-                        <p class="mb-0 mt-1 text-muted"
-                           style="font-size:11px;line-height:1.7;">
-                            Explore customer preferences and consider
-                            relevant offers based on their interests.
-                        </p>
-                    </div>
-                </div>
+    <script>
+        // Mobile sidebar toggle
+        const sidebar = document.getElementById("sidebar");
+        const menuButton = document.getElementById("menuButton");
 
-                <div class="d-flex gap-3 mb-4">
-                    <div class="segment-icon"
-                         style="background:#e7f2ff;color:#2878d0;flex-shrink:0;">
-                        <i class="fa-solid fa-chart-simple"></i>
-                    </div>
+        menuButton.addEventListener("click", function () {
+            sidebar.classList.toggle("show");
+        });
 
-                    <div>
-                        <strong style="font-size:12px;">Medium Spending</strong>
 
-                        <p class="mb-0 mt-1 text-muted"
-                           style="font-size:11px;line-height:1.7;">
-                            Examine purchasing patterns and identify
-                            opportunities to improve engagement.
-                        </p>
-                    </div>
-                </div>
+        // Close sidebar when clicking outside it on mobile
+        document.addEventListener("click", function (event) {
+            if (
+                window.innerWidth <= 991 &&
+                sidebar.classList.contains("show") &&
+                !sidebar.contains(event.target) &&
+                !menuButton.contains(event.target)
+            ) {
+                sidebar.classList.remove("show");
+            }
+        });
 
-                <div class="d-flex gap-3">
-                    <div class="segment-icon"
-                         style="background:#e2f8ed;color:#15966a;flex-shrink:0;">
-                        <i class="fa-solid fa-arrow-trend-up"></i>
-                    </div>
 
-                    <div>
-                        <strong style="font-size:12px;">High Spending</strong>
+        // Customer table search
+        const searchInput = document.getElementById("customerSearch");
+        const tableContainer = document.getElementById("customerTable");
+        const emptyMessage = document.getElementById("emptyMessage");
 
-                        <p class="mb-0 mt-1 text-muted"
-                           style="font-size:11px;line-height:1.7;">
-                            Understand the preferences of these customers
-                            and explore appropriate loyalty strategies.
-                        </p>
-                    </div>
-                </div>
+        searchInput.addEventListener("input", function () {
+            const searchTerm = this.value.toLowerCase().trim();
 
-                <div class="alert alert-light border mt-4 mb-0"
-                     style="font-size:10px;line-height:1.7;">
-                    <i class="fa-solid fa-circle-info text-primary me-1"></i>
-                    Segment labels describe spending behaviour in this dataset.
-                    They do not guarantee future purchasing behaviour.
-                </div>
+            const rows = tableContainer.querySelectorAll("tbody tr");
 
-            </div>
+            let visibleRows = 0;
 
-        </div>
+            rows.forEach(function (row) {
+                const rowText = row.textContent.toLowerCase();
 
-    </section>
+                const matches = rowText.includes(searchTerm);
 
-    <!-- Customer Table -->
-    <section class="content-card">
+                row.style.display = matches ? "" : "none";
 
-        <div class="section-heading">
-            <h5>
-                <i class="fa-solid fa-table-list text-primary me-2"></i>
-                Customer Details
-            </h5>
+                if (matches) {
+                    visibleRows++;
+                }
+            });
 
-            <p>
-                Browse the customer records associated with your segmentation.
-            </p>
-        </div>
+            emptyMessage.style.display =
+                rows.length > 0 && visibleRows === 0 ? "block" : "none";
+        });
 
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
 
-            <div class="table-search">
-                <i class="fa-solid fa-magnifying-glass"></i>
+        // Highlight segment names in the customer table
+        document.querySelectorAll("#customerTable tbody tr").forEach(
+            function (row) {
 
-                <input type="search"
-                       id="tableSearch"
-                       class="form-control"
-                       placeholder="Search customer records..."
-                       aria-label="Search customer records">
-            </div>
+                const cells = row.querySelectorAll("td");
 
-            <span class="badge rounded-pill text-bg-light p-2">
-                <i class="fa-solid fa-users me-1 text-primary"></i>
-                Customer Dataset
-            </span>
+                cells.forEach(function (cell) {
 
-        </div>
+                    const value = cell.textContent.trim();
 
-        <div class="table-responsive" id="customerTableContainer">
-            {{ customer_table | safe }}
-        </div>
+                    if (value === "Low Spending") {
+                        cell.innerHTML =
+                            '<span class="segment-badge badge-low">' +
+                            'Low Spending</span>';
+                    }
 
-        <div class="empty-state" id="emptyState">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <strong class="d-block mb-2">No matching customers found</strong>
-            <span>Try searching with a different keyword.</span>
-        </div>
+                    else if (value === "Medium Spending") {
+                        cell.innerHTML =
+                            '<span class="segment-badge badge-medium">' +
+                            'Medium Spending</span>';
+                    }
 
-        <div class="table-footer">
+                    else if (value === "High Spending") {
+                        cell.innerHTML =
+                            '<span class="segment-badge badge-high">' +
+                            'High Spending</span>';
+                    }
 
-            <small id="visibleCount">
-                Customer records
-            </small>
+                    else if (value.startsWith("Group ")) {
+                        const badge = document.createElement("span");
 
-            <div class="d-flex flex-wrap gap-2">
+                        badge.className = "segment-badge badge-other";
 
-                <a href="{{ url_for('results') }}"
-                   class="btn btn-outline-primary">
-                    <i class="fa-solid fa-chart-column me-2"></i>
-                    View Results
-                </a>
+                        badge.textContent = value;
 
-                <a href="{{ url_for('search_customers') }}"
-                   class="btn btn-outline-secondary">
-                    <i class="fa-solid fa-magnifying-glass me-2"></i>
-                    Advanced Search
-                </a>
-
-                <a href="{{ url_for('index') }}"
-                   class="btn btn-primary">
-                    <i class="fa-solid fa-house me-2"></i>
-                    Dashboard
-                </a>
-
-            </div>
-
-        </div>
-
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        Customer Segmentation | AI Analytics
-        <span class="mx-2">•</span>
-        Customer Behaviour Analysis
-    </footer>
-
-</main>
-
-<script>
-    // Values received from Flask
-    const lowCount = Math.max(0, Number({{ low_count | default(0) | tojson }}) || 0);
-    const mediumCount = Math.max(0, Number({{ medium_count | default(0) | tojson }}) || 0);
-    const highCount = Math.max(0, Number({{ high_count | default(0) | tojson }}) || 0);
-
-    const totalCustomers = lowCount + mediumCount + highCount;
-
-    function calculatePercentage(count) {
-        if (totalCustomers === 0) {
-            return 0;
-        }
-
-        return (count / totalCustomers) * 100;
-    }
-
-    function updateSegmentProgress(count, progressId, percentageId) {
-        const percentage = calculatePercentage(count);
-        const roundedPercentage = percentage.toFixed(1);
-
-        document.getElementById(progressId).style.width =
-            roundedPercentage + "%";
-
-        document.getElementById(progressId).setAttribute(
-            "aria-valuenow",
-            roundedPercentage
+                        cell.replaceChildren(badge);
+                    }
+                });
+            }
         );
 
-        document.getElementById(percentageId).textContent =
-            roundedPercentage + "%";
-    }
 
-    updateSegmentProgress(lowCount, "lowProgress", "lowPercentage");
-    updateSegmentProgress(mediumCount, "mediumProgress", "mediumPercentage");
-    updateSegmentProgress(highCount, "highProgress", "highPercentage");
+        // Chart.js segment chart
+        const chartCanvas = document.getElementById("segmentChart");
 
-    // Customer distribution chart
-    const chartCanvas = document.getElementById("segmentChart");
+        const chartLabels = {{ chart_labels | tojson }};
 
-    new Chart(chartCanvas, {
-        type: "doughnut",
+        const chartValues = {{ chart_values | tojson }};
 
-        data: {
-            labels: [
-                "Low Spending",
-                "Medium Spending",
-                "High Spending"
-            ],
+        if (chartCanvas && chartLabels.length > 0) {
 
-            datasets: [{
-                data: [lowCount, mediumCount, highCount],
-                backgroundColor: [
-                    "#f0a43a",
-                    "#4289e8",
-                    "#23b47e"
-                ],
-                borderColor: "#ffffff",
-                borderWidth: 4,
-                hoverOffset: 8
-            }]
-        },
+            new Chart(chartCanvas, {
+                type: "doughnut",
 
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: "66%",
+                data: {
+                    labels: chartLabels,
 
-            plugins: {
-                legend: {
-                    position: "bottom",
+                    datasets: [{
+                        label: "Number of Customers",
+                        data: chartValues,
 
-                    labels: {
-                        usePointStyle: true,
-                        pointStyle: "circle",
-                        padding: 20,
-                        boxWidth: 8,
-                        font: {
-                            family: "Inter",
-                            size: 11
-                        }
-                    }
+                        backgroundColor: [
+                            "#f59e0b",
+                            "#6366f1",
+                            "#10b981",
+                            "#0ea5e9",
+                            "#ec4899",
+                            "#8b5cf6",
+                            "#64748b"
+                        ],
+
+                        borderColor: "#ffffff",
+                        borderWidth: 4,
+                        hoverOffset: 8
+                    }]
                 },
 
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const value = Number(context.raw) || 0;
-                            const percentage = calculatePercentage(value);
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
 
-                            return " " + context.label + ": " +
-                                   value + " customers (" +
-                                   percentage.toFixed(1) + "%)";
+                    cutout: "68%",
+
+                    plugins: {
+                        legend: {
+                            position: "bottom",
+
+                            labels: {
+                                usePointStyle: true,
+                                pointStyle: "circle",
+                                padding: 20,
+
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    const value = context.raw;
+
+                                    const total = context.dataset.data.reduce(
+                                        (sum, item) => sum + item,
+                                        0
+                                    );
+
+                                    const percentage = total > 0
+                                        ? ((value / total) * 100).toFixed(1)
+                                        : "0.0";
+
+                                    return (
+                                        " " +
+                                        context.label +
+                                        ": " +
+                                        value +
+                                        " customers (" +
+                                        percentage +
+                                        "%)"
+                                    );
+                                }
+                            }
                         }
                     }
                 }
-            }
+            });
+
         }
-    });
-
-    // Mobile sidebar
-    const sidebar = document.getElementById("sidebar");
-    const menuToggle = document.getElementById("menuToggle");
-
-    menuToggle.addEventListener("click", function() {
-        const isOpen = sidebar.classList.toggle("open");
-
-        menuToggle.setAttribute(
-            "aria-expanded",
-            isOpen ? "true" : "false"
-        );
-    });
-
-    document.querySelectorAll(".nav-link-custom").forEach(function(link) {
-        link.addEventListener("click", function() {
-            if (window.innerWidth <= 1100) {
-                sidebar.classList.remove("open");
-                menuToggle.setAttribute("aria-expanded", "false");
-            }
-        });
-    });
-
-    // Search within the displayed customer table
-    const tableSearch = document.getElementById("tableSearch");
-    const tableContainer = document.getElementById("customerTableContainer");
-    const emptyState = document.getElementById("emptyState");
-    const visibleCount = document.getElementById("visibleCount");
-
-    function searchCustomerRows() {
-        const table = tableContainer.querySelector("table");
-
-        if (!table) {
-            visibleCount.textContent = "No customer table was provided.";
-            emptyState.style.display = "block";
-            return;
-        }
-
-        table.classList.add("table", "table-hover");
-
-        const rows = Array.from(table.querySelectorAll("tbody tr"));
-        const searchText = tableSearch.value.trim().toLowerCase();
-
-        let visibleRows = 0;
-
-        rows.forEach(function(row) {
-            const matches = row.innerText.toLowerCase().includes(searchText);
-
-            row.style.display = matches ? "" : "none";
-
-            if (matches) {
-                visibleRows++;
-            }
-        });
-
-        emptyState.style.display =
-            visibleRows === 0 ? "block" : "none";
-
-        visibleCount.textContent =
-            "Showing " + visibleRows + " of " + rows.length +
-            " displayed customer records.";
-    }
-
-    tableSearch.addEventListener("input", searchCustomerRows);
-
-    searchCustomerRows();
-</script>
+    </script>
 
 </body>
 </html>

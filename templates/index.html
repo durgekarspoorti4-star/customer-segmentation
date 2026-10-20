@@ -1,30 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Dashboard | Customer Insights</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
 
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet">
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome -->
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        rel="stylesheet"
+    >
 
     <style>
         :root {
-            --primary: #6558f5;
-            --purple: #8b5cf6;
-            --dark: #171b36;
-            --text: #73798d;
-            --border: #ececf4;
-            --background: #f7f8fc;
+            --primary: #4f46e5;
+            --primary-light: #eef2ff;
+            --background: #f5f7fb;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --sidebar-width: 250px;
         }
 
         * {
@@ -33,519 +36,381 @@
 
         body {
             margin: 0;
-            font-family: 'Inter', sans-serif;
             background: var(--background);
-            color: var(--dark);
+            color: var(--text-dark);
+            font-family: Arial, Helvetica, sans-serif;
         }
 
-        a {
-            text-decoration: none;
-        }
+        /* Sidebar */
 
         .sidebar {
-            width: 250px;
+            width: var(--sidebar-width);
             height: 100vh;
             position: fixed;
             top: 0;
             left: 0;
-            background: white;
-            border-right: 1px solid var(--border);
-            padding: 25px 17px;
             z-index: 1000;
+            padding: 24px 16px;
+            background: #ffffff;
+            border-right: 1px solid var(--border);
             overflow-y: auto;
-            transition: transform .3s;
+            transition: transform 0.3s ease;
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 0 8px;
-            margin-bottom: 38px;
-            color: var(--dark);
-            font-size: 17px;
+            gap: 12px;
+            padding: 8px 10px 28px;
+            color: var(--primary);
+            font-size: 19px;
             font-weight: 800;
+            text-decoration: none;
         }
 
         .brand-icon {
+            width: 42px;
+            height: 42px;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 40px;
-            height: 40px;
-            color: white;
-            border-radius: 12px;
-            background: linear-gradient(135deg, var(--primary), var(--purple));
+            background: var(--primary);
+            color: #ffffff;
+            border-radius: 13px;
         }
 
-        .menu-label {
-            padding: 0 12px;
-            margin: 23px 0 12px;
-            color: #a0a5b5;
-            font-size: 10px;
-            font-weight: 800;
+        .nav-heading {
+            margin: 18px 12px 10px;
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 700;
             letter-spacing: 1.2px;
+            text-transform: uppercase;
         }
 
-        .side-link {
+        .sidebar-link {
             display: flex;
             align-items: center;
-            gap: 13px;
-            padding: 13px 14px;
-            margin-bottom: 6px;
+            gap: 12px;
+            margin-bottom: 5px;
+            padding: 12px 14px;
             border-radius: 10px;
-            color: #70768a;
-            font-size: 12px;
-            font-weight: 600;
-            transition: .2s;
+            color: #64748b;
+            font-size: 14px;
+            text-decoration: none;
+            transition: 0.2s ease;
         }
 
-        .side-link i {
-            width: 18px;
+        .sidebar-link i {
+            width: 19px;
             text-align: center;
-            font-size: 15px;
         }
 
-        .side-link:hover,
-        .side-link.active {
-            background: #efedff;
+        .sidebar-link:hover {
+            background: var(--primary-light);
             color: var(--primary);
         }
 
-        .sidebar-bottom {
-            margin-top: 35px;
-            padding: 16px 10px;
-            border-radius: 13px;
-            background: #f6f4ff;
+        .sidebar-link.active {
+            background: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.18);
         }
 
-        .sidebar-bottom p {
-            margin: 8px 0;
-            color: #777d91;
-            font-size: 11px;
-            line-height: 1.7;
-        }
+        /* Main */
 
-        .main-content {
-            margin-left: 250px;
+        .main {
             min-height: 100vh;
+            margin-left: var(--sidebar-width);
+            padding: 30px;
         }
 
         .topbar {
-            position: sticky;
-            top: 0;
-            z-index: 900;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 15px;
-            padding: 19px 30px;
-            background: rgba(255,255,255,.97);
-            border-bottom: 1px solid var(--border);
+            margin-bottom: 30px;
         }
 
         .page-title {
-            font-size: 20px;
-            font-weight: 800;
             margin: 0;
+            font-size: 28px;
+            font-weight: 800;
         }
 
         .page-subtitle {
-            margin-top: 5px;
-            color: var(--text);
-            font-size: 11px;
-        }
-
-        .icon-button {
-            width: 38px;
-            height: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: #646b80;
-            background: white;
-            cursor: pointer;
-        }
-
-        .profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .avatar {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 39px;
-            height: 39px;
-            border-radius: 12px;
-            color: white;
-            background: linear-gradient(135deg, var(--primary), var(--purple));
-            font-size: 13px;
-            font-weight: 800;
-        }
-
-        .profile-name {
-            font-size: 11px;
-            font-weight: 800;
-        }
-
-        .profile-role {
-            margin-top: 4px;
-            color: var(--text);
-            font-size: 10px;
-        }
-
-        .dashboard-body {
-            padding: 28px 30px;
-        }
-
-        .welcome-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-bottom: 27px;
-        }
-
-        .welcome-row h2 {
-            font-size: 23px;
-            font-weight: 800;
-            margin: 0 0 9px;
-        }
-
-        .welcome-row p {
-            margin: 0;
-            color: var(--text);
-            font-size: 12px;
-        }
-
-        .primary-button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 9px;
-            padding: 12px 17px;
-            border: none;
-            border-radius: 10px;
-            color: white;
-            background: linear-gradient(135deg, var(--primary), var(--purple));
-            font-size: 11px;
-            font-weight: 700;
-        }
-
-        .primary-button:hover {
-            color: white;
-            opacity: .9;
-        }
-
-        .stat-card {
-            padding: 21px;
-            height: 100%;
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 15px;
-            transition: .2s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(36,30,100,.05);
-        }
-
-        .stat-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 43px;
-            height: 43px;
-            margin-bottom: 20px;
-            border-radius: 12px;
-            font-size: 17px;
-        }
-
-        .stat-label {
-            color: var(--text);
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .stat-value {
-            margin: 9px 0;
-            font-size: 26px;
-            font-weight: 800;
-            overflow-wrap: anywhere;
-        }
-
-        .stat-note {
-            color: var(--text);
-            font-size: 10px;
-            line-height: 1.7;
-        }
-
-        .purple-bg {
-            background: #efedff;
-            color: #6558f5;
-        }
-
-        .green-bg {
-            background: #e4fff4;
-            color: #0c9b6c;
-        }
-
-        .orange-bg {
-            background: #fff1e5;
-            color: #e88b35;
-        }
-
-        .blue-bg {
-            background: #e7f1ff;
-            color: #3275d8;
-        }
-
-        .panel {
-            height: 100%;
-            padding: 23px;
-            border: 1px solid var(--border);
-            border-radius: 15px;
-            background: white;
-        }
-
-        .panel-header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 23px;
-        }
-
-        .panel-header h5 {
-            margin: 0;
+            margin: 8px 0 0;
+            color: var(--text-muted);
             font-size: 14px;
-            font-weight: 800;
         }
 
-        .panel-header p {
-            margin: 7px 0 0;
-            color: var(--text);
-            font-size: 10px;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 270px;
-            width: 100%;
-        }
-
-        .segment-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 13px 0;
-            border-bottom: 1px solid #f0f0f6;
-        }
-
-        .segment-item:last-child {
-            border-bottom: none;
-        }
-
-        .segment-dot {
-            width: 11px;
-            height: 11px;
-            flex-shrink: 0;
-            border-radius: 4px;
-        }
-
-        .segment-info {
-            flex: 1;
-        }
-
-        .segment-info strong {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 11px;
-        }
-
-        .segment-info small {
-            color: var(--text);
-            font-size: 10px;
-        }
-
-        .segment-count {
-            font-size: 12px;
-            font-weight: 800;
-        }
-
-        .table-panel {
-            margin-top: 25px;
-        }
-
-        .table-responsive {
-            overflow-x: auto;
-        }
-
-        .customer-table {
-            width: 100%;
-            min-width: 600px;
-            border-collapse: collapse;
-        }
-
-        .customer-table th {
-            padding: 14px 12px;
-            border-bottom: 1px solid var(--border);
-            background: #fafaff;
-            color: #8b90a2;
-            font-size: 10px;
-            font-weight: 700;
-            text-align: left;
-        }
-
-        .customer-table td {
-            padding: 15px 12px;
-            border-bottom: 1px solid #f1f1f7;
-            color: #51576d;
-            font-size: 11px;
-        }
-
-        .customer-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .badge-segment {
-            display: inline-block;
-            padding: 7px 10px;
-            border-radius: 20px;
-            font-size: 9px;
-            font-weight: 700;
-        }
-
-        .low {
-            color: #6558f5;
-            background: #efedff;
-        }
-
-        .medium {
-            color: #0b9068;
-            background: #e4fff4;
-        }
-
-        .high {
-            color: #c57b19;
-            background: #fff1df;
-        }
-
-        .quick-action {
-            display: flex;
-            align-items: center;
-            gap: 13px;
-            padding: 15px 0;
-            border-bottom: 1px solid #f0f0f6;
-            color: var(--dark);
-        }
-
-        .quick-action:last-child {
-            border-bottom: none;
-        }
-
-        .quick-action:hover {
-            color: var(--primary);
-        }
-
-        .quick-icon {
+        .user-badge {
+            width: 44px;
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 39px;
-            height: 39px;
-            border-radius: 11px;
-            background: #efedff;
+            background: var(--primary-light);
             color: var(--primary);
-        }
-
-        .quick-action strong {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 11px;
-        }
-
-        .quick-action small {
-            color: var(--text);
-            font-size: 10px;
-        }
-
-        .empty-state {
-            padding: 25px;
-            text-align: center;
-            color: var(--text);
-            font-size: 12px;
-        }
-
-        footer {
-            padding: 20px 30px;
-            color: #8b90a2;
-            font-size: 10px;
-            border-top: 1px solid var(--border);
-            background: white;
+            border-radius: 50%;
+            font-size: 18px;
         }
 
         .mobile-menu {
             display: none;
+            width: 42px;
+            height: 42px;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #ffffff;
         }
 
-        @media (max-width: 1100px) {
+        /* Welcome banner */
+
+        .welcome-banner {
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 26px;
+            padding: 30px;
+            border-radius: 18px;
+            background: linear-gradient(120deg, #4f46e5, #7c3aed);
+            color: #ffffff;
+        }
+
+        .welcome-banner h2 {
+            margin-bottom: 10px;
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .welcome-banner p {
+            max-width: 600px;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .welcome-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .welcome-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 9px;
+            background: #ffffff;
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .welcome-btn:hover {
+            background: #f1f5f9;
+            color: #3730a3;
+        }
+
+        .welcome-btn-outline {
+            background: transparent;
+            color: #ffffff;
+        }
+
+        .welcome-btn-outline:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+        }
+
+        /* Statistics */
+
+        .stat-card {
+            height: 100%;
+            padding: 23px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: #ffffff;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.025);
+            transition: transform 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .stat-icon {
+            width: 46px;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 13px;
+            font-size: 18px;
+        }
+
+        .purple {
+            background: #eef2ff;
+            color: #4f46e5;
+        }
+
+        .green {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .orange {
+            background: #ffedd5;
+            color: #c2410c;
+        }
+
+        .blue {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .stat-value {
+            margin-top: 20px;
+            font-size: 31px;
+            font-weight: 800;
+            letter-spacing: -0.8px;
+        }
+
+        .stat-description {
+            margin-top: 6px;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        /* Feature cards */
+
+        .section-heading {
+            margin: 30px 0 18px;
+            font-size: 19px;
+            font-weight: 800;
+        }
+
+        .feature-card {
+            display: block;
+            height: 100%;
+            padding: 23px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: #ffffff;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: 0.2s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-3px);
+            border-color: #c7d2fe;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 17px;
+            border-radius: 14px;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 20px;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 9px;
+            font-size: 16px;
+            font-weight: 750;
+        }
+
+        .feature-card p {
+            margin-bottom: 16px;
+            color: var(--text-muted);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .feature-link {
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .footer {
+            padding: 30px 0 5px;
+            color: #94a3b8;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        /* Responsive */
+
+        @media (max-width: 991px) {
             .sidebar {
                 transform: translateX(-100%);
             }
 
             .sidebar.show {
                 transform: translateX(0);
-                box-shadow: 10px 0 30px rgba(0,0,0,.08);
+                box-shadow: 10px 0 30px rgba(15, 23, 42, 0.12);
             }
 
-            .main-content {
+            .main {
                 margin-left: 0;
+                padding: 22px;
             }
 
             .mobile-menu {
-                display: flex;
+                display: inline-flex;
             }
         }
 
-        @media (max-width: 600px) {
-            .topbar {
-                padding: 15px;
-            }
-
-            .dashboard-body {
-                padding: 20px 15px;
-            }
-
-            .profile-details {
-                display: none;
+        @media (max-width: 575px) {
+            .main {
+                padding: 16px;
             }
 
             .page-title {
-                font-size: 16px;
+                font-size: 22px;
             }
 
-            .welcome-row h2 {
-                font-size: 20px;
+            .welcome-banner {
+                padding: 23px;
             }
 
-            .stat-value {
+            .welcome-banner h2 {
                 font-size: 21px;
             }
 
-            .panel {
-                padding: 17px;
+            .stat-card {
+                padding: 18px;
             }
 
-            footer {
-                padding: 18px 15px;
+            .stat-value {
+                font-size: 27px;
             }
         }
     </style>
@@ -553,559 +418,428 @@
 
 <body>
 
-<aside class="sidebar" id="sidebar">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
 
-    <a href="{{ url_for('home') }}" class="brand">
-        <span class="brand-icon">
-            <i class="fa-solid fa-chart-pie"></i>
-        </span>
-        <span>Customer<span style="color:#6558f5;">Insights</span></span>
-    </a>
+        <a href="{{ url_for('index') }}" class="brand">
+            <span class="brand-icon">
+                <i class="fa-solid fa-chart-pie"></i>
+            </span>
 
-    <div class="menu-label">MAIN MENU</div>
-
-    <a href="{{ url_for('index') }}" class="side-link active">
-        <i class="fa-solid fa-house"></i> Dashboard
-    </a>
-
-    <a href="{{ url_for('analysis') }}" class="side-link">
-        <i class="fa-solid fa-chart-column"></i> Data Analysis
-    </a>
-
-    <a href="{{ url_for('segments') }}" class="side-link">
-        <i class="fa-solid fa-users"></i> Customer Segments
-    </a>
-
-    <a href="{{ url_for('prediction') }}" class="side-link">
-        <i class="fa-solid fa-wand-magic-sparkles"></i> Segment Prediction
-    </a>
-
-    <div class="menu-label">DATA MANAGEMENT</div>
-
-    <a href="{{ url_for('upload') }}" class="side-link">
-        <i class="fa-solid fa-file-arrow-up"></i> Upload Dataset
-    </a>
-
-    <a href="{{ url_for('results') }}" class="side-link">
-        <i class="fa-solid fa-chart-pie"></i> Clustering Results
-    </a>
-
-    <a href="{{ url_for('download') }}" class="side-link">
-        <i class="fa-solid fa-download"></i> Download Results
-    </a>
-
-    <div class="menu-label">ACCOUNT</div>
-
-    <a href="{{ url_for('home') }}" class="side-link">
-        <i class="fa-solid fa-globe"></i> Home Page
-    </a>
-
-    <a href="{{ url_for('logout') }}" class="side-link">
-        <i class="fa-solid fa-right-from-bracket"></i> Sign Out
-    </a>
-
-    <div class="sidebar-bottom">
-        <strong>
-            <i class="fa-solid fa-lightbulb me-2" style="color:#6558f5;"></i>
-            Smart Insights
-        </strong>
-        <p>Explore customer behaviour using your dataset and segmentation tools.</p>
-        <a href="{{ url_for('prediction') }}"
-           style="font-size:11px;font-weight:700;color:#6558f5;">
-            Try Prediction <i class="fa-solid fa-arrow-right ms-1"></i>
+            <span>Customer Insights</span>
         </a>
-    </div>
 
-</aside>
+        <div class="nav-heading">Workspace</div>
 
-<main class="main-content">
+        <a href="{{ url_for('index') }}" class="sidebar-link active">
+            <i class="fa-solid fa-house"></i>
+            <span>Dashboard</span>
+        </a>
 
-    <header class="topbar">
+        <a href="{{ url_for('upload') }}" class="sidebar-link">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <span>Upload Dataset</span>
+        </a>
 
-        <div class="d-flex align-items-center gap-3">
-            <button class="icon-button mobile-menu"
-                    id="menuToggle"
-                    type="button"
-                    aria-label="Toggle navigation">
-                <i class="fa-solid fa-bars"></i>
-            </button>
+        <a href="{{ url_for('analysis') }}" class="sidebar-link">
+            <i class="fa-solid fa-magnifying-glass-chart"></i>
+            <span>Data Analysis</span>
+        </a>
 
-            <div>
-                <h1 class="page-title">Dashboard Overview</h1>
-                <div class="page-subtitle">
-                    Monitor your customer segmentation insights
-                </div>
-            </div>
-        </div>
+        <a href="{{ url_for('kmeans_page') }}" class="sidebar-link">
+            <i class="fa-solid fa-diagram-project"></i>
+            <span>K-Means Clustering</span>
+        </a>
 
-        <div class="d-flex align-items-center gap-3">
-            <button class="icon-button"
-                    id="dateButton"
-                    type="button"
-                    title="Show today's date">
-                <i class="fa-regular fa-calendar"></i>
-            </button>
+        <a href="{{ url_for('results') }}" class="sidebar-link">
+            <i class="fa-solid fa-chart-column"></i>
+            <span>Clustering Results</span>
+        </a>
 
-            <div class="profile">
-                <div class="avatar" id="userAvatar">
-                    {{ session.get('user', 'U')[:1]|upper }}
-                </div>
-                <div class="profile-details">
-                    <div class="profile-name">
-                        {{ session.get('user', 'User') }}
+        <a href="{{ url_for('segments') }}" class="sidebar-link">
+            <i class="fa-solid fa-users"></i>
+            <span>Customer Segments</span>
+        </a>
+
+        <a href="{{ url_for('prediction') }}" class="sidebar-link">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>Prediction</span>
+        </a>
+
+        <div class="nav-heading">Account</div>
+
+        <a href="{{ url_for('logout') }}" class="sidebar-link">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+        </a>
+
+    </aside>
+
+
+    <!-- Main content -->
+    <main class="main">
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div
+                        class="alert alert-{{ category }} alert-dismissible fade show"
+                        role="alert"
+                    >
+                        <i class="fa-solid fa-circle-info me-2"></i>
+
+                        {{ message }}
+
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Close"
+                        ></button>
                     </div>
-                    <div class="profile-role">Customer Analytics</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+
+        <!-- Header -->
+        <header class="topbar">
+
+            <div class="d-flex align-items-start gap-3">
+
+                <button
+                    type="button"
+                    class="mobile-menu"
+                    id="menuButton"
+                    aria-label="Toggle navigation"
+                >
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+                <div>
+                    <h1 class="page-title">Dashboard</h1>
+
+                    <p class="page-subtitle">
+                        Monitor your customer data and segmentation results.
+                    </p>
                 </div>
-            </div>
-        </div>
 
-    </header>
-
-    <div class="dashboard-body">
-
-        <section class="welcome-row">
-            <div>
-                <h2>Welcome to Customer Analytics 👋</h2>
-                <p>Explore your actual customer data and spending patterns.</p>
             </div>
 
-            <a href="{{ url_for('prediction') }}" class="primary-button">
-                <i class="fa-solid fa-wand-magic-sparkles"></i>
-                Predict Customer Segment
-            </a>
+            <div class="user-badge">
+                <i class="fa-solid fa-user"></i>
+            </div>
+
+        </header>
+
+
+        <!-- Welcome banner -->
+        <section class="welcome-banner">
+
+            <h2>
+                Welcome{% if session.get('user_name') %}
+                    , {{ session.get('user_name') }}
+                {% endif %}! 👋
+            </h2>
+
+            <p>
+                Analyze customer purchasing behavior, discover meaningful
+                customer groups, and predict the spending segment of a new
+                customer using K-Means clustering.
+            </p>
+
+            <div class="welcome-actions">
+
+                <a href="{{ url_for('upload') }}" class="welcome-btn">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    Upload Dataset
+                </a>
+
+                <a
+                    href="{{ url_for('kmeans_page') }}"
+                    class="welcome-btn welcome-btn-outline"
+                >
+                    <i class="fa-solid fa-diagram-project"></i>
+                    Run Clustering
+                </a>
+
+            </div>
+
         </section>
 
-        <!-- Real dataset statistics -->
 
-        <section class="row g-3 mb-4">
+        <!-- Statistics -->
+        <section class="row g-4">
 
-            <div class="col-6 col-xl-3">
+            <div class="col-12 col-sm-6 col-xl-3">
                 <div class="stat-card">
-                    <div class="stat-icon purple-bg">
-                        <i class="fa-solid fa-users"></i>
+
+                    <div class="stat-top">
+                        <span class="stat-label">Total Customers</span>
+
+                        <span class="stat-icon purple">
+                            <i class="fa-solid fa-users"></i>
+                        </span>
                     </div>
-                    <div class="stat-label">Total Customers</div>
+
                     <div class="stat-value">
-                        {{ total_customers|default(0, true) }}
+                        {{ total_customers | default(0) }}
                     </div>
-                    <div class="stat-note">Customers in clustered dataset</div>
+
+                    <div class="stat-description">
+                        Customer records available
+                    </div>
+
                 </div>
             </div>
 
-            <div class="col-6 col-xl-3">
+
+            <div class="col-12 col-sm-6 col-xl-3">
                 <div class="stat-card">
-                    <div class="stat-icon green-bg">
-                        <i class="fa-solid fa-layer-group"></i>
+
+                    <div class="stat-top">
+                        <span class="stat-label">Average Age</span>
+
+                        <span class="stat-icon green">
+                            <i class="fa-solid fa-user-clock"></i>
+                        </span>
                     </div>
-                    <div class="stat-label">Customer Segments</div>
+
                     <div class="stat-value">
-                        {{ total_clusters|default(0, true) }}
+                        {{ average_age | default(0) }}
                     </div>
-                    <div class="stat-note">Distinct clusters detected</div>
+
+                    <div class="stat-description">
+                        Average customer age in years
+                    </div>
+
                 </div>
             </div>
 
-            <div class="col-6 col-xl-3">
+
+            <div class="col-12 col-sm-6 col-xl-3">
                 <div class="stat-card">
-                    <div class="stat-icon orange-bg">
-                        <i class="fa-solid fa-wallet"></i>
+
+                    <div class="stat-top">
+                        <span class="stat-label">Average Income</span>
+
+                        <span class="stat-icon orange">
+                            <i class="fa-solid fa-wallet"></i>
+                        </span>
                     </div>
-                    <div class="stat-label">Average Annual Income</div>
+
                     <div class="stat-value">
-                        {{ "%.2f"|format(average_income|default(0, true)|float) }}
+                        {{ average_income | default(0) }}
                     </div>
-                    <div class="stat-note">Income in thousands ($k)</div>
+
+                    <div class="stat-description">
+                        Average annual income (k$)
+                    </div>
+
                 </div>
             </div>
 
-            <div class="col-6 col-xl-3">
+
+            <div class="col-12 col-sm-6 col-xl-3">
                 <div class="stat-card">
-                    <div class="stat-icon blue-bg">
-                        <i class="fa-solid fa-chart-line"></i>
+
+                    <div class="stat-top">
+                        <span class="stat-label">Average Spending</span>
+
+                        <span class="stat-icon blue">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                        </span>
                     </div>
-                    <div class="stat-label">Average Spending Score</div>
+
                     <div class="stat-value">
-                        {{ "%.2f"|format(average_spending|default(0, true)|float) }}
+                        {{ average_spending | default(0) }}
                     </div>
-                    <div class="stat-note">Scale: 1–100</div>
+
+                    <div class="stat-description">
+                        Average spending score out of 100
+                    </div>
+
                 </div>
             </div>
 
         </section>
 
-        <!-- Charts -->
+
+        <!-- Features -->
+        <h2 class="section-heading">Project Features</h2>
 
         <section class="row g-4">
 
-            <div class="col-lg-8">
-                <div class="panel">
-                    <div class="panel-header">
-                        <div>
-                            <h5>Customer Spending Analysis</h5>
-                            <p>Average spending score for each detected segment</p>
-                        </div>
+            <div class="col-12 col-md-6 col-xl-4">
+                <a href="{{ url_for('upload') }}" class="feature-card">
 
-                        <select class="form-select form-select-sm"
-                                id="chartType"
-                                aria-label="Chart type"
-                                style="width:115px;">
-                            <option value="bar">Bar Chart</option>
-                            <option value="line">Line Chart</option>
-                        </select>
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-file-csv"></i>
                     </div>
 
-                    <div class="chart-container">
-                        <canvas id="spendingChart"></canvas>
-                    </div>
+                    <h3>Upload Customer Data</h3>
 
-                    {% if not customer_labels %}
-                    <div class="empty-state">
-                        Run K-Means after uploading a dataset to view the chart.
-                    </div>
-                    {% endif %}
-                </div>
+                    <p>
+                        Upload your CSV dataset to begin analyzing customer
+                        information and purchasing behavior.
+                    </p>
+
+                    <span class="feature-link">
+                        Upload data
+                        <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </span>
+
+                </a>
             </div>
 
-            <div class="col-lg-4">
-                <div class="panel">
-                    <div class="panel-header">
-                        <div>
-                            <h5>Segment Distribution</h5>
-                            <p>Customer count by segment</p>
-                        </div>
+
+            <div class="col-12 col-md-6 col-xl-4">
+                <a href="{{ url_for('analysis') }}" class="feature-card">
+
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-magnifying-glass-chart"></i>
                     </div>
 
-                    <div class="chart-container" style="height:225px;">
-                        <canvas id="segmentChart"></canvas>
-                    </div>
+                    <h3>Data Analysis</h3>
 
-                    <div id="segmentLegend"></div>
-                </div>
+                    <p>
+                        Review customer statistics, average values, dataset
+                        columns, and available records.
+                    </p>
+
+                    <span class="feature-link">
+                        Analyze data
+                        <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </span>
+
+                </a>
             </div>
 
-        </section>
 
-        <!-- Customer records -->
+            <div class="col-12 col-md-6 col-xl-4">
+                <a href="{{ url_for('kmeans_page') }}" class="feature-card">
 
-        <section class="row g-4 table-panel">
-
-            <div class="col-lg-8" id="customers">
-                <div class="panel">
-                    <div class="panel-header">
-                        <div>
-                            <h5>Customer Records</h5>
-                            <p>Recent rows from your clustered dataset</p>
-                        </div>
-
-                        <a href="{{ url_for('download') }}"
-                           class="btn btn-sm btn-outline-primary">
-                            <i class="fa-solid fa-download me-1"></i>
-                            Download CSV
-                        </a>
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-diagram-project"></i>
                     </div>
 
-                    <div class="table-responsive">
-                        <table class="customer-table">
-                            <thead>
-                                <tr>
-                                    {% for column in table_columns %}
-                                    <th>{{ column }}</th>
-                                    {% endfor %}
-                                </tr>
-                            </thead>
+                    <h3>K-Means Clustering</h3>
 
-                            <tbody>
-                                {% for row in customer_rows %}
-                                <tr>
-                                    {% for value in row %}
-                                    <td>{{ value }}</td>
-                                    {% endfor %}
-                                </tr>
-                                {% else %}
-                                <tr>
-                                    <td colspan="{{ table_columns|length if table_columns else 1 }}"
-                                        class="text-center py-4">
-                                        No customer records available.
-                                        Upload a dataset and run K-Means first.
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                    <p>
+                        Group customers based on annual income and spending
+                        score using the K-Means algorithm.
+                    </p>
 
-                </div>
+                    <span class="feature-link">
+                        Run clustering
+                        <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </span>
+
+                </a>
             </div>
 
-            <div class="col-lg-4">
-                <div class="panel">
-                    <div class="panel-header">
-                        <div>
-                            <h5>Quick Actions</h5>
-                            <p>Explore project features</p>
-                        </div>
+
+            <div class="col-12 col-md-6 col-xl-4">
+                <a href="{{ url_for('results') }}" class="feature-card">
+
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-chart-column"></i>
                     </div>
 
-                    <a href="{{ url_for('upload') }}" class="quick-action">
-                        <span class="quick-icon">
-                            <i class="fa-solid fa-file-arrow-up"></i>
-                        </span>
-                        <span>
-                            <strong>Upload Dataset</strong>
-                            <small>Import your customer CSV file</small>
-                        </span>
-                        <i class="fa-solid fa-chevron-right ms-auto"></i>
-                    </a>
+                    <h3>Clustering Results</h3>
 
-                    <a href="{{ url_for('analysis') }}" class="quick-action">
-                        <span class="quick-icon"
-                              style="background:#e5fff4;color:#0b9b6c;">
-                            <i class="fa-solid fa-chart-column"></i>
-                        </span>
-                        <span>
-                            <strong>Explore Analysis</strong>
-                            <small>Review data statistics</small>
-                        </span>
-                        <i class="fa-solid fa-chevron-right ms-auto"></i>
-                    </a>
+                    <p>
+                        Explore the generated clusters and inspect the
+                        customer records assigned to each group.
+                    </p>
 
-                    <a href="{{ url_for('segments') }}" class="quick-action">
-                        <span class="quick-icon"
-                              style="background:#fff1e5;color:#e88b35;">
-                            <i class="fa-solid fa-users"></i>
-                        </span>
-                        <span>
-                            <strong>View Segments</strong>
-                            <small>Explore customer groups</small>
-                        </span>
-                        <i class="fa-solid fa-chevron-right ms-auto"></i>
-                    </a>
+                    <span class="feature-link">
+                        View results
+                        <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </span>
 
-                    <a href="{{ url_for('prediction') }}" class="quick-action">
-                        <span class="quick-icon"
-                              style="background:#e7f1ff;color:#3275d8;">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i>
-                        </span>
-                        <span>
-                            <strong>Predict a Segment</strong>
-                            <small>Estimate customer segment</small>
-                        </span>
-                        <i class="fa-solid fa-chevron-right ms-auto"></i>
-                    </a>
+                </a>
+            </div>
 
-                </div>
+
+            <div class="col-12 col-md-6 col-xl-4">
+                <a href="{{ url_for('segments') }}" class="feature-card">
+
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+
+                    <h3>Customer Segments</h3>
+
+                    <p>
+                        Review spending segment counts, percentages, charts,
+                        and the searchable customer table.
+                    </p>
+
+                    <span class="feature-link">
+                        View segments
+                        <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </span>
+
+                </a>
+            </div>
+
+
+            <div class="col-12 col-md-6 col-xl-4">
+                <a href="{{ url_for('prediction') }}" class="feature-card">
+
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+
+                    <h3>Customer Prediction</h3>
+
+                    <p>
+                        Enter a new customer's details to predict the
+                        customer's cluster using your saved model.
+                    </p>
+
+                    <span class="feature-link">
+                        Predict segment
+                        <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </span>
+
+                </a>
             </div>
 
         </section>
 
-    </div>
 
-    <footer class="d-flex flex-wrap justify-content-between gap-2">
-        <span>© 2026 Customer Insights — Customer Segmentation Project</span>
-        <span>Built with Flask, Python, HTML, CSS and Chart.js</span>
-    </footer>
+        <footer class="footer">
+            Customer Insights &copy; 2026 |
+            AI-Powered Customer Segmentation
+        </footer>
 
-</main>
+    </main>
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
 
-    // Receive chart data from Flask
-    const segmentLabels = {{ customer_labels|default([], true)|tojson }};
-    const segmentCounts = {{ customer_counts|default([], true)|tojson }};
-    const averageScores = {{ segment_spending|default([], true)|tojson }};
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    const colors = [
-        "#6558f5",
-        "#20b486",
-        "#f59e0b",
-        "#3275d8",
-        "#e35d8f",
-        "#14b8a6",
-        "#8b5cf6"
-    ];
+    <script>
+        const sidebar = document.getElementById("sidebar");
+        const menuButton = document.getElementById("menuButton");
 
-    let spendingChart = null;
-    let segmentChart = null;
-
-    // Render spending chart
-    function renderSpendingChart(type = "bar") {
-
-        const canvas = document.getElementById("spendingChart");
-
-        if (!canvas || typeof Chart === "undefined") {
-            console.error("Spending chart canvas or Chart.js is missing.");
-            return;
-        }
-
-        if (spendingChart) {
-            spendingChart.destroy();
-        }
-
-        spendingChart = new Chart(canvas, {
-            type: type,
-            data: {
-                labels: segmentLabels,
-                datasets: [{
-                    label: "Average Spending Score",
-                    data: averageScores,
-                    backgroundColor: colors.slice(0, segmentLabels.length),
-                    borderColor: colors.slice(0, segmentLabels.length),
-                    borderWidth: 2,
-                    borderRadius: type === "bar" ? 7 : 0,
-                    tension: 0.35,
-                    fill: false
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
-                        title: {
-                            display: true,
-                            text: "Average Spending Score"
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // Render segment distribution chart
-    function renderSegmentChart() {
-
-        const canvas = document.getElementById("segmentChart");
-
-        if (!canvas || typeof Chart === "undefined") {
-            console.error("Segment chart canvas or Chart.js is missing.");
-            return;
-        }
-
-        if (segmentChart) {
-            segmentChart.destroy();
-        }
-
-        segmentChart = new Chart(canvas, {
-            type: "doughnut",
-            data: {
-                labels: segmentLabels,
-                datasets: [{
-                    data: segmentCounts,
-                    backgroundColor: segmentLabels.map(
-                        (_, index) => colors[index % colors.length]
-                    ),
-                    borderWidth: 0,
-                    hoverOffset: 5
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: "70%",
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                }
-            }
-        });
-
-        // Create segment legend
-        const legend = document.getElementById("segmentLegend");
-
-        if (!legend) {
-            return;
-        }
-
-        legend.replaceChildren();
-
-        const total = segmentCounts.reduce(
-            (sum, value) => sum + (Number(value) || 0),
-            0
-        );
-
-        segmentLabels.forEach(function (label, index) {
-
-            const count = Number(segmentCounts[index]) || 0;
-            const percentage = total > 0
-                ? ((count / total) * 100).toFixed(1)
-                : "0.0";
-
-            const item = document.createElement("div");
-            item.className = "segment-item";
-
-            const dot = document.createElement("span");
-            dot.className = "segment-dot";
-            dot.style.backgroundColor =
-                colors[index % colors.length];
-
-            const info = document.createElement("div");
-            info.className = "segment-info";
-
-            const name = document.createElement("strong");
-            name.textContent = label;
-
-            const description = document.createElement("small");
-            description.textContent = count + " customers";
-
-            info.append(name, description);
-
-            const value = document.createElement("span");
-            value.className = "segment-count";
-            value.textContent = percentage + "%";
-
-            item.append(dot, info, value);
-            legend.appendChild(item);
-        });
-    }
-
-    // Chart type selector
-    const chartType = document.getElementById("chartType");
-
-    if (chartType) {
-        chartType.addEventListener("change", function () {
-            renderSpendingChart(this.value);
-        });
-    }
-
-    // Mobile sidebar toggle
-    const menuToggle = document.getElementById("menuToggle");
-    const sidebar = document.getElementById("sidebar");
-
-    if (menuToggle && sidebar) {
-        menuToggle.addEventListener("click", function () {
+        menuButton.addEventListener("click", function () {
             sidebar.classList.toggle("show");
         });
-    }
 
-    // Date button
-    const dateButton = document.getElementById("dateButton");
-
-    if (dateButton) {
-        dateButton.addEventListener("click", function () {
-            alert(
-                "Today's date: " +
-                new Date().toLocaleDateString()
-            );
+        document.addEventListener("click", function (event) {
+            if (
+                window.innerWidth <= 991 &&
+                sidebar.classList.contains("show") &&
+                !sidebar.contains(event.target) &&
+                !menuButton.contains(event.target)
+            ) {
+                sidebar.classList.remove("show");
+            }
         });
-    }
-
-    // Initialize charts
-    renderSpendingChart();
-    renderSegmentChart();
-
-});
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    </script>
 
 </body>
 </html>

@@ -1,3 +1,16 @@
+import os
+import json
+import secrets
+import logging
+
+import numpy as np
+import pandas as pd
+import matplotlib
+
+matplotlib.use("Agg")
+
+import matplotlib.pyplot as plt
+
 from flask import (
     Flask,
     render_template,
@@ -6,540 +19,428 @@ from flask import (
     url_for,
     send_file,
     session,
-    flash
+    flash,
 )
 
-import os
-import io
-import json
-import secrets
-import logging
-
-import pandas as pd
-import matplotlib
-
-matplotlib.use("Agg")
-
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-from sklearn.cluster import KMeans
-from werkzeug.security import (
-    generate_password_hash,
-    check_password_hash
-)
-from werkzeug.utils import secure_filename
 from functools import wraps
+from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+from joblib import dump, load
 
 
-# ============================================================
+# =========================================================
 # APPLICATION CONFIGURATION
-# ============================================================
+# =========================================================
 
 app = Flask(__name__)
 
-app.config["SECRET_KEY"] = os.environ.get(
-    "SECRET_KEY",
-    "local-development-key-change-before-deployment"
-)
+app.secret_key = os.environ.get("SECRET_KEY") or secrets.token_hex(32)
 
-app.config["SESSION_COOKIE_HTTPONLY"] = True
-app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-app.config["SESSION_COOKIE_SECURE"] = bool(os.environ.get("RENDER"))
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
-
-logging.basicConfig(level=logging.INFO)
-
-
-# ============================================================
-# DIRECTORIES
-# ============================================================
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 DATASET_DIR = os.path.join(BASE_DIR, "dataset")
 GRAPH_DIR = os.path.join(BASE_DIR, "static", "graphs")
-
-USERS_FILE = os.path.join(BASE_DIR, "users.json")
+TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
 
 CUSTOMERS_FILE = os.path.join(DATASET_DIR, "customers.csv")
-CLUSTERED_FILE = os.path.join(
-    DATASET_DIR,
-    "clustered_customers.csv"
-)
-
+CLUSTERED_FILE = os.path.join(DATASET_DIR, "clustered_customers.csv")
 MODEL_FILE = os.path.join(DATASET_DIR, "kmeans_model.joblib")
 METADATA_FILE = os.path.join(DATASET_DIR, "model_metadata.json")
+USERS_FILE = os.path.join(BASE_DIR, "users.json")
 
-RESULT_GRAPH = os.path.join(GRAPH_DIR, "results.png")
+RESULTS_GRAPH = os.path.join(GRAPH_DIR, "results.png")
 
 os.makedirs(DATASET_DIR, exist_ok=True)
 os.makedirs(GRAPH_DIR, exist_ok=True)
 
+app.config.update(
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_SECURE=bool(os.environ.get("RENDER")),
+)
 
-# ============================================================
-# DATASET CONFIGURATION
-# ============================================================
+logging.basicConfig(level=logging.INFO)
+
+logger = logging.getLogger(__name__)
+
+
+# =========================================================
+# REQUIRED DATASET COLUMNS
+# =========================================================
 
 INCOME_COLUMN = "Annual Income (k$)"
 SPENDING_COLUMN = "Spending Score (1-100)"
 
 FEATURE_COLUMNS = [
     INCOME_COLUMN,
-    SPENDING_COLUMN
+    SPENDING_COLUMN,
 ]
 
 REQUIRED_COLUMNS = [
+    "CustomerID",
+    "Gender",
     "Age",
     INCOME_COLUMN,
-    SPENDING_COLUMN
-]
-
-SEGMENT_NAMES = [
-    "Low Spending",
-    "Medium Spending",
-    "High Spending"
+    SPENDING_COLUMN,
 ]
 
 
-# ============================================================
-# AUTHENTICATION DECORATOR
-# ============================================================
+# =========================================================
+# AUTHENTICATION
+# =========================================================
 
-def login_required(view):
-    @wraps(view)
-    def wrapped_view(*args, **kwargs):
+def login_required(function):
+    @wraps(function)
+    def decorated_function(*args, **kwargs):
         if "user" not in session:
+            flash("Please log in to continue.", "warning")
             return redirect(url_for("login"))
 
-        return view(*args, **kwargs)
+        return function(*args, **kwargs)
 
-    return wrapped_view
-
-
-# ============================================================
-# GENERAL HELPER FUNCTIONS
-# ============================================================
-
-def read_csv_file(path):
-    """
-    Read a CSV file and normalize column names.
-    """
-    df = pd.read_csv(path)
-    df.columns = df.columns.astype(str).str.strip()
-    return df
+    return decorated_function
 
 
-def clean_numeric_columns(df, columns):
-    """
-    Convert selected columns to numeric values.
-    Invalid values become NaN.
-    """
-    for column in columns:
-        if column in df.columns:
-            df[column] = pd.to_numeric(
-                df[column],
-                errors="coerce"
-            )
+def read_users():
+    """Read registered users from the JSON file."""
 
-    return df
-
-
-def get_segment_mapping(df):
-    """
-    Map cluster IDs to segment names based on average spending.
-
-    For three clusters:
-        Lowest average spending -> Low Spending
-        Middle average spending -> Medium Spending
-        Highest average spending -> High Spending
-
-    For other cluster counts, use Group 1, Group 2, etc.
-    """
-    if "Cluster" not in df.columns:
-        return {}
-
-    if SPENDING_COLUMN not in df.columns:
-        return {}
-
-    working = df[["Cluster", SPENDING_COLUMN]].copy()
-
-    working = clean_numeric_columns(
-        working,
-        ["Cluster", SPENDING_COLUMN]
-    )
-
-    working = working.dropna(
-        subset=["Cluster", SPENDING_COLUMN]
-    )
-
-    if working.empty:
-        return {}
-
-    working["Cluster"] = working["Cluster"].astype(int)
-
-    averages = (
-        working.groupby("Cluster")[SPENDING_COLUMN]
-        .mean()
-        .sort_values()
-    )
-
-    clusters = list(averages.index)
-
-    if len(clusters) == 3:
-        return {
-            clusters[0]: "Low Spending",
-            clusters[1]: "Medium Spending",
-            clusters[2]: "High Spending"
-        }
-
-    return {
-        cluster: f"Group {index + 1}"
-        for index, cluster in enumerate(clusters)
-    }
-
-
-def add_segment_column(df):
-    """
-    Add a Segment column based on cluster spending averages.
-    """
-    df = df.copy()
-
-    if "Cluster" not in df.columns:
-        return df
-
-    mapping = get_segment_mapping(df)
-
-    df["Segment"] = pd.to_numeric(
-        df["Cluster"],
-        errors="coerce"
-    ).map(mapping)
-
-    return df
-
-
-def get_valid_clustered_data():
-    """
-    Read and validate clustered customer data.
-    """
-    if not os.path.exists(CLUSTERED_FILE):
-        return None
-
-    df = read_csv_file(CLUSTERED_FILE)
-
-    if "Cluster" not in df.columns and "cluster" in df.columns:
-        df.rename(
-            columns={"cluster": "Cluster"},
-            inplace=True
-        )
-
-    required = FEATURE_COLUMNS + ["Cluster"]
-
-    if not all(column in df.columns for column in required):
-        return None
-
-    df = clean_numeric_columns(df, required)
-
-    df = df.dropna(
-        subset=required
-    ).copy()
-
-    if df.empty:
-        return None
-
-    df["Cluster"] = df["Cluster"].astype(int)
-
-    df = add_segment_column(df)
-
-    return df
-
-
-def save_plot():
-    """
-    Create the customer segmentation scatter plot.
-    """
-    df = get_valid_clustered_data()
-
-    if df is None:
-        return False
-
-    plt.figure(figsize=(10, 6))
-
-    sns.scatterplot(
-        data=df,
-        x=INCOME_COLUMN,
-        y=SPENDING_COLUMN,
-        hue="Segment",
-        palette="viridis",
-        s=90
-    )
-
-    plt.title("Customer Segmentation Using K-Means")
-    plt.xlabel("Annual Income (k$)")
-    plt.ylabel("Spending Score (1-100)")
-    plt.grid(alpha=0.2)
-    plt.tight_layout()
-
-    plt.savefig(
-        RESULT_GRAPH,
-        dpi=150,
-        bbox_inches="tight"
-    )
-
-    plt.close()
-
-    return True
-
-
-def create_html_table(df, max_rows=None):
-    """
-    Convert a DataFrame to an HTML table for the templates.
-    """
-    display_df = df.copy()
-
-    if max_rows is not None:
-        display_df = display_df.head(max_rows)
-
-    display_df = display_df.astype(object).where(
-        pd.notna(display_df),
-        ""
-    )
-
-    return display_df.to_html(
-        classes="table table-striped table-hover table-bordered",
-        index=False,
-        border=0,
-        escape=True
-    )
-
-
-def load_users():
-    """
-    Load registered users from users.json.
-    """
     if not os.path.exists(USERS_FILE):
-        return []
+        return {}
 
     try:
         with open(USERS_FILE, "r", encoding="utf-8") as file:
             users = json.load(file)
 
-        return users if isinstance(users, list) else []
+        return users if isinstance(users, dict) else {}
 
     except (json.JSONDecodeError, OSError):
-        app.logger.exception("Unable to read users file")
-        return []
+        logger.exception("Unable to read users.json")
+        return {}
 
 
-def save_users(users):
-    """
-    Save users to users.json.
-    """
-    with open(USERS_FILE, "w", encoding="utf-8") as file:
+def write_users(users):
+    """Save registered users to the JSON file."""
+
+    temporary_file = USERS_FILE + ".tmp"
+
+    with open(temporary_file, "w", encoding="utf-8") as file:
         json.dump(users, file, indent=4)
 
+    os.replace(temporary_file, USERS_FILE)
 
-def get_filtered_customers():
-    """
-    Apply the customer search filters and return the filtered DataFrame.
 
-    This helper is shared by the search page and CSV export.
-    """
-    df = get_valid_clustered_data()
+# =========================================================
+# DATASET HELPERS
+# =========================================================
 
-    if df is None:
-        return None
+def read_customer_csv(file_path):
+    """Read a CSV file and normalize its column names."""
 
-    customer_id = request.args.get(
-        "customer_id",
-        ""
-    ).strip()
+    df = pd.read_csv(file_path)
 
-    selected_segment = request.args.get(
-        "segment",
-        "All"
-    ).strip()
+    df.columns = df.columns.astype(str).str.strip()
 
-    min_age = request.args.get(
-        "min_age",
-        ""
-    ).strip()
+    return df
 
-    max_age = request.args.get(
-        "max_age",
-        ""
-    ).strip()
 
-    min_income = request.args.get(
-        "min_income",
-        ""
-    ).strip()
+def validate_dataset(df):
+    """Validate required customer columns and numeric values."""
 
-    max_income = request.args.get(
-        "max_income",
-        ""
-    ).strip()
-
-    numeric_columns = [
-        "CustomerID",
-        "Age",
-        INCOME_COLUMN,
-        SPENDING_COLUMN
+    missing_columns = [
+        column
+        for column in REQUIRED_COLUMNS
+        if column not in df.columns
     ]
 
-    df = clean_numeric_columns(
-        df,
-        numeric_columns
-    )
-
-    if customer_id and "CustomerID" in df.columns:
-        df = df[
-            df["CustomerID"].astype("Int64").astype(str)
-            .str.contains(customer_id, na=False)
-        ]
-
-    if selected_segment and selected_segment != "All":
-        df = df[df["Segment"] == selected_segment]
-
-    try:
-        if min_age and "Age" in df.columns:
-            df = df[df["Age"] >= float(min_age)]
-
-        if max_age and "Age" in df.columns:
-            df = df[df["Age"] <= float(max_age)]
-
-        if min_income:
-            df = df[df[INCOME_COLUMN] >= float(min_income)]
-
-        if max_income:
-            df = df[df[INCOME_COLUMN] <= float(max_income)]
-
-    except ValueError:
+    if missing_columns:
         raise ValueError(
-            "Please enter valid numeric filter values."
+            "Missing required columns: "
+            + ", ".join(missing_columns)
         )
 
-    filters = {
-        "customer_id": customer_id,
-        "selected_segment": selected_segment or "All",
-        "min_age": min_age,
-        "max_age": max_age,
-        "min_income": min_income,
-        "max_income": max_income
-    }
+    if df.empty:
+        raise ValueError("The uploaded CSV file contains no customer records.")
 
-    return df, filters
+    for column in [
+        "Age",
+        INCOME_COLUMN,
+        SPENDING_COLUMN,
+    ]:
+        df[column] = pd.to_numeric(
+            df[column],
+            errors="coerce",
+        )
+
+    df.replace([np.inf, -np.inf], np.nan, inplace=True)
+
+    df.dropna(
+        subset=[
+            INCOME_COLUMN,
+            SPENDING_COLUMN,
+        ],
+        inplace=True,
+    )
+
+    if df.empty:
+        raise ValueError(
+            "No valid income and spending values were found."
+        )
+
+    if len(df) < 2:
+        raise ValueError(
+            "At least two valid customers are required for clustering."
+        )
+
+    if (df[INCOME_COLUMN] < 0).any():
+        raise ValueError("Annual income cannot contain negative values.")
+
+    if not df[SPENDING_COLUMN].between(1, 100).all():
+        raise ValueError(
+            "Spending Score values must be between 1 and 100."
+        )
+
+    return df.reset_index(drop=True)
 
 
-# ============================================================
+def get_segment_mapping(df):
+    """
+    Map cluster numbers to readable segment names.
+
+    For three clusters:
+        Lowest average spending  -> Low Spending
+        Middle average spending  -> Medium Spending
+        Highest average spending -> High Spending
+
+    For other cluster counts, use Group 1, Group 2, etc.
+    """
+
+    if "Cluster" not in df.columns:
+        raise ValueError("The dataset does not contain a Cluster column.")
+
+    if SPENDING_COLUMN not in df.columns:
+        raise ValueError(
+            f"The dataset does not contain {SPENDING_COLUMN}."
+        )
+
+    cluster_means = (
+        df.groupby("Cluster")[SPENDING_COLUMN]
+        .mean()
+        .sort_values()
+    )
+
+    cluster_ids = cluster_means.index.tolist()
+
+    if len(cluster_ids) == 3:
+        names = [
+            "Low Spending",
+            "Medium Spending",
+            "High Spending",
+        ]
+
+    else:
+        names = [
+            f"Group {number}"
+            for number in range(1, len(cluster_ids) + 1)
+        ]
+
+    return dict(zip(cluster_ids, names))
+
+
+def get_valid_clustered_data():
+    """Read and validate the previously clustered customer dataset."""
+
+    if not os.path.exists(CLUSTERED_FILE):
+        raise FileNotFoundError(
+            "Clustered data was not found. Run K-Means clustering first."
+        )
+
+    df = read_customer_csv(CLUSTERED_FILE)
+
+    missing_columns = [
+        column
+        for column in FEATURE_COLUMNS + ["Cluster"]
+        if column not in df.columns
+    ]
+
+    if missing_columns:
+        raise ValueError(
+            "The clustered dataset is missing: "
+            + ", ".join(missing_columns)
+        )
+
+    df[INCOME_COLUMN] = pd.to_numeric(
+        df[INCOME_COLUMN],
+        errors="coerce",
+    )
+
+    df[SPENDING_COLUMN] = pd.to_numeric(
+        df[SPENDING_COLUMN],
+        errors="coerce",
+    )
+
+    df["Cluster"] = pd.to_numeric(
+        df["Cluster"],
+        errors="coerce",
+    )
+
+    df.replace([np.inf, -np.inf], np.nan, inplace=True)
+
+    df.dropna(
+        subset=FEATURE_COLUMNS + ["Cluster"],
+        inplace=True,
+    )
+
+    if df.empty:
+        raise ValueError("No valid clustered customer records were found.")
+
+    df["Cluster"] = df["Cluster"].astype(int)
+
+    mapping = get_segment_mapping(df)
+
+    df["Segment"] = df["Cluster"].map(mapping)
+
+    return df.reset_index(drop=True)
+
+
+def create_results_graph(df):
+    """Generate a scatter plot of customer clusters."""
+
+    plt.figure(figsize=(10, 6))
+
+    for cluster_id in sorted(df["Cluster"].unique()):
+        cluster_df = df[df["Cluster"] == cluster_id]
+
+        plt.scatter(
+            cluster_df[INCOME_COLUMN],
+            cluster_df[SPENDING_COLUMN],
+            label=f"Cluster {cluster_id}",
+            alpha=0.75,
+        )
+
+    plt.xlabel("Annual Income (k$)")
+    plt.ylabel("Spending Score (1-100)")
+    plt.title("Customer Segmentation Using K-Means")
+    plt.legend()
+    plt.grid(alpha=0.2)
+    plt.tight_layout()
+
+    plt.savefig(
+        RESULTS_GRAPH,
+        dpi=150,
+        bbox_inches="tight",
+    )
+
+    plt.close()
+
+
+def load_model_metadata():
+    """Read model metadata if it exists."""
+
+    if not os.path.exists(METADATA_FILE):
+        return {}
+
+    try:
+        with open(METADATA_FILE, "r", encoding="utf-8") as file:
+            return json.load(file)
+
+    except (json.JSONDecodeError, OSError):
+        logger.exception("Unable to read model metadata")
+        return {}
+
+
+# =========================================================
 # HOME PAGE
-# ============================================================
+# =========================================================
 
 @app.route("/")
 def home():
     return render_template("home.html")
 
 
-# ============================================================
+# =========================================================
 # DASHBOARD
-# ============================================================
+# =========================================================
 
 @app.route("/index")
 @login_required
 def index():
+    try:
+        if os.path.exists(CLUSTERED_FILE):
+            df = read_customer_csv(CLUSTERED_FILE)
 
-    total_customers = 0
-    total_clusters = 0
+        elif os.path.exists(CUSTOMERS_FILE):
+            df = read_customer_csv(CUSTOMERS_FILE)
 
-    average_income = 0
-    average_spending = 0
-
-    customer_labels = []
-    customer_counts = []
-    segment_spending = []
-
-    table_columns = []
-    customer_rows = []
-
-    graph_exists = os.path.exists(RESULT_GRAPH)
-
-    df = get_valid_clustered_data()
-
-    if df is not None:
+        else:
+            df = pd.DataFrame()
 
         total_customers = len(df)
 
-        average_income = round(
-            float(df[INCOME_COLUMN].mean()),
-            2
-        )
+        total_columns = len(df.columns)
 
-        average_spending = round(
-            float(df[SPENDING_COLUMN].mean()),
-            2
-        )
+        average_age = 0
+        average_income = 0
+        average_spending = 0
 
-        summary = (
-            df.groupby("Segment")
-            .agg(
-                Customer_Count=("Cluster", "size"),
-                Average_Spending=(SPENDING_COLUMN, "mean")
+        if "Age" in df.columns:
+            average_age = round(
+                pd.to_numeric(df["Age"], errors="coerce").mean(),
+                2,
             )
+
+        if INCOME_COLUMN in df.columns:
+            average_income = round(
+                pd.to_numeric(
+                    df[INCOME_COLUMN],
+                    errors="coerce",
+                ).mean(),
+                2,
+            )
+
+        if SPENDING_COLUMN in df.columns:
+            average_spending = round(
+                pd.to_numeric(
+                    df[SPENDING_COLUMN],
+                    errors="coerce",
+                ).mean(),
+                2,
+            )
+
+        return render_template(
+            "index.html",
+            total_customers=total_customers,
+            total_columns=total_columns,
+            average_age=average_age,
+            average_income=average_income,
+            average_spending=average_spending,
         )
 
-        summary = summary.sort_values(
-            "Average_Spending"
+    except Exception:
+        logger.exception("Dashboard failed to load")
+
+        flash("Unable to load the dashboard.", "danger")
+
+        return render_template(
+            "index.html",
+            total_customers=0,
+            total_columns=0,
+            average_age=0,
+            average_income=0,
+            average_spending=0,
         )
 
-        total_clusters = len(summary)
 
-        customer_labels = summary.index.tolist()
-
-        customer_counts = (
-            summary["Customer_Count"]
-            .astype(int)
-            .tolist()
-        )
-
-        segment_spending = (
-            summary["Average_Spending"]
-            .round(2)
-            .tolist()
-        )
-
-        table_df = df.head(10).copy()
-
-        table_df = table_df.astype(object).where(
-            pd.notna(table_df),
-            ""
-        )
-
-        table_columns = table_df.columns.tolist()
-        customer_rows = table_df.values.tolist()
-
-    return render_template(
-        "index.html",
-        total_customers=total_customers,
-        total_clusters=total_clusters,
-        average_income=average_income,
-        average_spending=average_spending,
-        graph_exists=graph_exists,
-        customer_labels=customer_labels,
-        customer_counts=customer_counts,
-        segment_spending=segment_spending,
-        table_columns=table_columns,
-        customer_rows=customer_rows
-    )
-
-
-# ============================================================
-# DATASET UPLOAD
-# ============================================================
+# =========================================================
+# UPLOAD DATASET
+# =========================================================
 
 @app.route("/upload", methods=["GET", "POST"])
 @login_required
 def upload():
-
     if request.method == "POST":
 
         uploaded_file = request.files.get("file")
@@ -548,11 +449,9 @@ def upload():
             flash("Please select a CSV file.", "warning")
             return redirect(url_for("upload"))
 
-        safe_filename = secure_filename(
-            uploaded_file.filename
-        )
+        filename = secure_filename(uploaded_file.filename)
 
-        if not safe_filename.lower().endswith(".csv"):
+        if not filename.lower().endswith(".csv"):
             flash("Only CSV files are supported.", "danger")
             return redirect(url_for("upload"))
 
@@ -561,826 +460,520 @@ def upload():
 
             df.columns = df.columns.astype(str).str.strip()
 
-            missing_columns = [
-                column
-                for column in REQUIRED_COLUMNS
-                if column not in df.columns
-            ]
+            df = validate_dataset(df)
 
-            if missing_columns:
-                flash(
-                    "Missing required columns: "
-                    + ", ".join(missing_columns),
-                    "danger"
-                )
-                return redirect(url_for("upload"))
+            df.to_csv(CUSTOMERS_FILE, index=False)
 
-            if df.empty:
-                flash("The uploaded dataset is empty.", "danger")
-                return redirect(url_for("upload"))
-
-            df = clean_numeric_columns(
-                df,
-                REQUIRED_COLUMNS
-            )
-
-            df = df.dropna(
-                subset=REQUIRED_COLUMNS
-            )
-
-            if df.empty:
-                flash(
-                    "No valid customer records were found.",
-                    "danger"
-                )
-                return redirect(url_for("upload"))
-
-            if (df[SPENDING_COLUMN] < 1).any() or (
-                df[SPENDING_COLUMN] > 100
-            ).any():
-                flash(
-                    "Spending Score values must be between 1 and 100.",
-                    "danger"
-                )
-                return redirect(url_for("upload"))
-
-            if (df["Age"] < 1).any() or (df["Age"] > 100).any():
-                flash(
-                    "Age values must be between 1 and 100.",
-                    "danger"
-                )
-                return redirect(url_for("upload"))
-
-            if (df[INCOME_COLUMN] < 0).any():
-                flash(
-                    "Annual income cannot be negative.",
-                    "danger"
-                )
-                return redirect(url_for("upload"))
-
-            df.to_csv(
-                CUSTOMERS_FILE,
-                index=False
-            )
-
-            # New data invalidates old clustering results and model.
-            for path in [
+            # A new dataset invalidates previous clustering results.
+            for old_file in [
                 CLUSTERED_FILE,
                 MODEL_FILE,
                 METADATA_FILE,
-                RESULT_GRAPH
+                RESULTS_GRAPH,
             ]:
-                if os.path.exists(path):
-                    os.remove(path)
+                if os.path.exists(old_file):
+                    os.remove(old_file)
 
             flash(
-                "Dataset uploaded successfully.",
-                "success"
+                f"Dataset uploaded successfully: {len(df)} valid customers.",
+                "success",
             )
 
             return redirect(url_for("analysis"))
 
-        except (pd.errors.ParserError, UnicodeDecodeError, ValueError):
-            flash(
-                "Unable to read this CSV file. Please check its format.",
-                "danger"
-            )
-            return redirect(url_for("upload"))
+        except Exception as error:
+            logger.exception("Dataset upload failed")
 
-        except Exception:
-            app.logger.exception("Dataset upload failed")
-            flash(
-                "An unexpected error occurred while uploading the dataset.",
-                "danger"
-            )
+            flash(str(error), "danger")
+
             return redirect(url_for("upload"))
 
     return render_template("upload.html")
 
 
-# ============================================================
+# =========================================================
 # DATA ANALYSIS
-# ============================================================
+# =========================================================
 
 @app.route("/analysis")
 @login_required
 def analysis():
-
-    if not os.path.exists(CUSTOMERS_FILE):
-        flash("Upload a dataset before viewing the analysis.", "warning")
-        return redirect(url_for("upload"))
-
     try:
-        df = read_csv_file(CUSTOMERS_FILE)
+        if not os.path.exists(CUSTOMERS_FILE):
+            flash("Please upload a customer CSV file first.", "warning")
+            return redirect(url_for("upload"))
 
-        missing_columns = [
-            column
-            for column in REQUIRED_COLUMNS
-            if column not in df.columns
-        ]
+        df = read_customer_csv(CUSTOMERS_FILE)
 
-        if missing_columns:
-            return (
-                "Dataset is missing required columns: "
-                + ", ".join(missing_columns),
-                400
-            )
-
-        df = clean_numeric_columns(
-            df,
-            REQUIRED_COLUMNS
-        )
+        df = validate_dataset(df)
 
         total_customers = len(df)
         total_columns = len(df.columns)
 
-        average_age = round(
-            float(df["Age"].mean()),
-            2
-        ) if df["Age"].notna().any() else 0
+        mean_age = round(df["Age"].mean(), 2)
+        mean_income = round(df[INCOME_COLUMN].mean(), 2)
+        mean_spending = round(df[SPENDING_COLUMN].mean(), 2)
 
-        average_income = round(
-            float(df[INCOME_COLUMN].mean()),
-            2
-        ) if df[INCOME_COLUMN].notna().any() else 0
+        missing_values = int(df.isna().sum().sum())
 
-        average_spending = round(
-            float(df[SPENDING_COLUMN].mean()),
-            2
-        ) if df[SPENDING_COLUMN].notna().any() else 0
-
-        missing_values = int(
-            df.isnull().sum().sum()
-        )
-
-        table = create_html_table(
-            df,
-            max_rows=20
+        customer_table = df.head(20).to_html(
+            index=False,
+            classes="table table-hover table-striped",
+            border=0,
+            na_rep="-",
+            escape=True,
         )
 
         return render_template(
             "analysis.html",
             total_customers=total_customers,
             total_columns=total_columns,
-            average_age=average_age,
-            average_income=average_income,
-            average_spending=average_spending,
+            mean_age=mean_age,
+            mean_income=mean_income,
+            mean_spending=mean_spending,
             missing_values=missing_values,
-            table=table
+            customer_table=customer_table,
         )
 
     except Exception:
-        app.logger.exception("Data analysis failed")
-        return "Unable to analyze the dataset. Check the application logs.", 500
+        logger.exception("Analysis page failed")
+
+        flash(
+            "Unable to analyze the dataset. Check the CSV columns.",
+            "danger",
+        )
+
+        return redirect(url_for("index"))
 
 
-# ============================================================
+# =========================================================
 # K-MEANS CLUSTERING
-# ============================================================
+# =========================================================
 
 @app.route("/kmeans", methods=["GET", "POST"])
 @login_required
 def kmeans_page():
-
     if request.method == "POST":
-
-        try:
-            k = int(request.form.get("k", 3))
-        except (ValueError, TypeError):
-            return "Invalid number of clusters.", 400
-
-        if not 2 <= k <= 10:
-            return "Choose between 2 and 10 clusters.", 400
 
         if not os.path.exists(CUSTOMERS_FILE):
             flash("Please upload a dataset first.", "warning")
             return redirect(url_for("upload"))
 
         try:
-            df = read_csv_file(CUSTOMERS_FILE)
+            k = int(request.form.get("clusters", 3))
 
-            if not all(
-                column in df.columns
-                for column in FEATURE_COLUMNS
-            ):
-                return "The dataset is missing required clustering columns.", 400
+            if k < 2:
+                flash("The number of clusters must be at least 2.", "danger")
+                return redirect(url_for("kmeans_page"))
 
-            df = clean_numeric_columns(
-                df,
-                FEATURE_COLUMNS
-            )
+            df = read_customer_csv(CUSTOMERS_FILE)
 
-            df = df.dropna(
-                subset=FEATURE_COLUMNS
-            ).copy()
+            df = validate_dataset(df)
 
-            if len(df) < k:
-                return (
-                    "The number of clusters cannot exceed "
-                    "the number of valid customers.",
-                    400
+            if k >= len(df):
+                flash(
+                    "The number of clusters must be smaller than "
+                    "the number of customers.",
+                    "danger",
                 )
+                return redirect(url_for("kmeans_page"))
+
+            features = df[FEATURE_COLUMNS].astype(float)
 
             model = KMeans(
                 n_clusters=k,
                 random_state=42,
-                n_init=10
+                n_init=10,
             )
 
-            df["Cluster"] = model.fit_predict(
-                df[FEATURE_COLUMNS]
-            )
+            df["Cluster"] = model.fit_predict(features)
 
-            # Save the exact fitted model for future predictions.
-            import joblib
+            mapping = get_segment_mapping(df)
 
-            joblib.dump(
-                model,
-                MODEL_FILE
-            )
+            df["Segment"] = df["Cluster"].map(mapping)
+
+            # Save clustered customer data.
+            df.to_csv(CLUSTERED_FILE, index=False)
+
+            # Save the trained model.
+            dump(model, MODEL_FILE)
+
+            metadata = {
+                "feature_columns": FEATURE_COLUMNS,
+                "n_clusters": k,
+                "random_state": 42,
+                "n_init": 10,
+                "segment_mapping": {
+                    str(key): value
+                    for key, value in mapping.items()
+                },
+            }
 
             with open(
                 METADATA_FILE,
                 "w",
-                encoding="utf-8"
+                encoding="utf-8",
             ) as file:
+                json.dump(metadata, file, indent=4)
 
-                json.dump(
-                    {
-                        "features": FEATURE_COLUMNS,
-                        "n_clusters": k,
-                        "random_state": 42,
-                        "n_init": 10
-                    },
-                    file,
-                    indent=4
-                )
-
-            df.to_csv(
-                CLUSTERED_FILE,
-                index=False
-            )
-
-            save_plot()
+            create_results_graph(df)
 
             flash(
-                f"K-Means clustering completed with {k} clusters.",
-                "success"
+                f"K-Means clustering completed successfully "
+                f"with {k} clusters.",
+                "success",
             )
 
             return redirect(url_for("results"))
 
         except Exception:
-            app.logger.exception("K-Means clustering failed")
-            return "Unable to perform K-Means clustering.", 500
+            logger.exception("K-Means clustering failed")
 
-    return render_template(
-        "kmeans.html",
-        result=False
-    )
+            flash(
+                "Clustering failed. Check your dataset and application logs.",
+                "danger",
+            )
+
+            return redirect(url_for("kmeans_page"))
+
+    return render_template("kmeans.html")
 
 
-# ============================================================
-# RESULTS PAGE
-# ============================================================
+# =========================================================
+# CLUSTERING RESULTS
+# =========================================================
 
 @app.route("/results")
 @login_required
 def results():
-
-    df = get_valid_clustered_data()
-
-    if df is None:
-        flash("Run K-Means clustering to view results.", "warning")
-        return redirect(url_for("kmeans_page"))
-
     try:
-        summary = (
-            df.groupby(["Cluster", "Segment"])
-            .agg(
-                Customer_Count=("Cluster", "size"),
-                Average_Income=(INCOME_COLUMN, "mean"),
-                Average_Spending=(SPENDING_COLUMN, "mean")
-            )
-            .reset_index()
+        df = get_valid_clustered_data()
+
+        customer_table = df.to_html(
+            index=False,
+            classes="table table-hover table-striped",
+            border=0,
+            na_rep="-",
+            escape=True,
         )
 
-        summary["Average_Income"] = (
-            summary["Average_Income"].round(2)
+        cluster_counts = (
+            df["Segment"]
+            .value_counts()
+            .to_dict()
         )
-
-        summary["Average_Spending"] = (
-            summary["Average_Spending"].round(2)
-        )
-
-        save_plot()
-
-        summary_table = create_html_table(summary)
-        customer_table = create_html_table(df)
 
         return render_template(
             "results.html",
-            summary_table=summary_table,
-            customer_table=customer_table
+            customer_table=customer_table,
+            total_customers=len(df),
+            cluster_counts=cluster_counts,
+            results_graph=url_for(
+                "static",
+                filename="graphs/results.png",
+            ),
         )
 
+    except FileNotFoundError:
+        flash("Please run K-Means clustering first.", "warning")
+        return redirect(url_for("kmeans_page"))
+
     except Exception:
-        app.logger.exception("Unable to display clustering results")
-        return "Unable to display the clustering results.", 500
+        logger.exception("Results page failed")
+
+        flash("Unable to load clustering results.", "danger")
+
+        return redirect(url_for("index"))
 
 
-# ============================================================
+# =========================================================
+# CUSTOMER SEGMENTS
+# =========================================================
+
+@app.route("/segments")
+@login_required
+def segments():
+    try:
+        df = get_valid_clustered_data()
+
+        segment_counts = df["Segment"].value_counts().to_dict()
+
+        low_count = int(segment_counts.get("Low Spending", 0))
+        medium_count = int(segment_counts.get("Medium Spending", 0))
+        high_count = int(segment_counts.get("High Spending", 0))
+
+        total_customers = len(df)
+
+        # Convert to JSON for safe use by Chart.js.
+        chart_labels = list(segment_counts.keys())
+
+        chart_values = [
+            int(segment_counts[label])
+            for label in chart_labels
+        ]
+
+        customer_table = df.to_html(
+            index=False,
+            classes="table table-hover table-striped align-middle",
+            border=0,
+            na_rep="-",
+            escape=True,
+        )
+
+        return render_template(
+            "segments.html",
+            low_count=low_count,
+            medium_count=medium_count,
+            high_count=high_count,
+            total_customers=total_customers,
+            segment_counts=segment_counts,
+            chart_labels=chart_labels,
+            chart_values=chart_values,
+            customer_table=customer_table,
+        )
+
+    except FileNotFoundError:
+        flash("Please run K-Means clustering first.", "warning")
+        return redirect(url_for("kmeans_page"))
+
+    except Exception:
+        logger.exception("Customer segments page failed")
+
+        flash(
+            "Unable to load customer segments. Check the application logs.",
+            "danger",
+        )
+
+        return redirect(url_for("index"))
+
+
+# =========================================================
 # DOWNLOAD CLUSTERED DATASET
-# ============================================================
+# =========================================================
 
 @app.route("/download")
 @login_required
 def download():
-
     if not os.path.exists(CLUSTERED_FILE):
-        flash("Run K-Means before downloading results.", "warning")
+        flash("Please run K-Means clustering before downloading.", "warning")
         return redirect(url_for("kmeans_page"))
 
     return send_file(
         CLUSTERED_FILE,
         as_attachment=True,
-        download_name="customer_segmentation_results.csv"
+        download_name="clustered_customers.csv",
+        mimetype="text/csv",
     )
 
 
-# ============================================================
+# =========================================================
 # CUSTOMER PREDICTION
-# ============================================================
+# =========================================================
 
 @app.route("/prediction", methods=["GET", "POST"])
 @login_required
 def prediction():
-
     prediction_result = None
-    cluster_result = None
+    predicted_cluster = None
+
+    form_values = {
+        "gender": "",
+        "age": "",
+        "income": "",
+        "spending": "",
+    }
 
     if request.method == "POST":
 
+        form_values = {
+            "gender": request.form.get("gender", "").strip(),
+            "age": request.form.get("age", "").strip(),
+            "income": request.form.get("income", "").strip(),
+            "spending": request.form.get("spending", "").strip(),
+        }
+
         try:
-            gender = request.form.get(
-                "gender",
-                ""
-            ).strip().lower()
+            age = float(form_values["age"])
+            income = float(form_values["income"])
+            spending = float(form_values["spending"])
 
-            age = float(request.form.get("age", ""))
-            income = float(request.form.get("income", ""))
-            spending = float(request.form.get("spending", ""))
-
-            if gender not in ("male", "female", "m", "f"):
-                return "Please select Male or Female.", 400
-
-            if not 1 <= age <= 100:
-                return "Age must be between 1 and 100.", 400
+            if not 0 <= age <= 120:
+                raise ValueError("Please enter an age between 0 and 120.")
 
             if income < 0:
-                return "Income cannot be negative.", 400
+                raise ValueError("Annual income cannot be negative.")
 
             if not 1 <= spending <= 100:
-                return "Spending Score must be between 1 and 100.", 400
+                raise ValueError(
+                    "Spending score must be between 1 and 100."
+                )
 
-        except (ValueError, TypeError):
-            return "Please enter valid customer details.", 400
+            if not os.path.exists(CLUSTERED_FILE):
+                flash(
+                    "Run K-Means clustering before making predictions.",
+                    "warning",
+                )
+                return redirect(url_for("kmeans_page"))
 
-        if not all(
-            os.path.exists(path)
-            for path in [
-                MODEL_FILE,
-                METADATA_FILE,
-                CLUSTERED_FILE
-            ]
-        ):
+            if not os.path.exists(MODEL_FILE):
+                flash(
+                    "The saved model was not found. Run K-Means again.",
+                    "warning",
+                )
+                return redirect(url_for("kmeans_page"))
+
+            model = load(MODEL_FILE)
+
+            input_df = pd.DataFrame(
+                [[income, spending]],
+                columns=FEATURE_COLUMNS,
+            )
+
+            predicted_cluster = int(model.predict(input_df)[0])
+
+            clustered_df = get_valid_clustered_data()
+
+            mapping = get_segment_mapping(clustered_df)
+
+            prediction_result = mapping.get(
+                predicted_cluster,
+                f"Group {predicted_cluster + 1}",
+            )
+
             flash(
-                "Run K-Means clustering before making predictions.",
-                "warning"
-            )
-            return redirect(url_for("kmeans_page"))
-
-        try:
-            import joblib
-
-            model = joblib.load(MODEL_FILE)
-
-            with open(
-                METADATA_FILE,
-                "r",
-                encoding="utf-8"
-            ) as file:
-                metadata = json.load(file)
-
-            df = get_valid_clustered_data()
-
-            if df is None:
-                return "The saved clustering dataset is invalid.", 400
-
-            feature_columns = metadata.get(
-                "features",
-                FEATURE_COLUMNS
+                f"Customer segment predicted: {prediction_result}",
+                "success",
             )
 
-            if feature_columns != FEATURE_COLUMNS:
-                return "The saved model features are incompatible.", 400
-
-            new_customer = pd.DataFrame(
-                [{
-                    INCOME_COLUMN: income,
-                    SPENDING_COLUMN: spending
-                }],
-                columns=feature_columns
-            )
-
-            # Use the exact model fitted in the K-Means route.
-            cluster_result = int(
-                model.predict(new_customer)[0]
-            )
-
-            segment_map = get_segment_mapping(df)
-
-            prediction_result = segment_map.get(
-                cluster_result,
-                "Unknown Segment"
-            )
+        except ValueError as error:
+            flash(str(error), "danger")
 
         except Exception:
-            app.logger.exception("Prediction failed")
-            return "Unable to predict the customer segment.", 500
+            logger.exception("Customer prediction failed")
+
+            flash(
+                "Prediction failed. Run K-Means again and try once more.",
+                "danger",
+            )
 
     return render_template(
         "prediction.html",
         prediction=prediction_result,
-        cluster=cluster_result
+        cluster=predicted_cluster,
+        form_values=form_values,
     )
 
 
-# ============================================================
-# CUSTOMER SEGMENTS
-# ============================================================
-
-@app.route("/segments")
-@login_required
-def segments():
-
-    df = get_valid_clustered_data()
-
-    if df is None:
-        flash("Run K-Means before viewing customer segments.", "warning")
-        return redirect(url_for("kmeans_page"))
-
-    low_count = int(
-        (df["Segment"] == "Low Spending").sum()
-    )
-
-    medium_count = int(
-        (df["Segment"] == "Medium Spending").sum()
-    )
-
-    high_count = int(
-        (df["Segment"] == "High Spending").sum()
-    )
-
-    customer_table = create_html_table(df)
-
-    return render_template(
-        "segments.html",
-        low_count=low_count,
-        medium_count=medium_count,
-        high_count=high_count,
-        customer_table=customer_table
-    )
-
-
-# ============================================================
-# SEARCH AND FILTER CUSTOMERS
-# ============================================================
-
-@app.route("/search", methods=["GET", "POST"])
-@login_required
-def search_customers():
-
-    if not os.path.exists(CLUSTERED_FILE):
-        flash("Run K-Means before searching customers.", "warning")
-        return redirect(url_for("kmeans_page"))
-
-    try:
-        result = get_filtered_customers()
-
-        if result is None:
-            return "The clustered dataset is invalid.", 400
-
-        df, filters = result
-
-        customer_table = create_html_table(df)
-
-        return render_template(
-            "search.html",
-            customer_table=customer_table,
-            result_count=len(df),
-            customer_id=filters["customer_id"],
-            selected_segment=filters["selected_segment"],
-            min_age=filters["min_age"],
-            max_age=filters["max_age"],
-            min_income=filters["min_income"],
-            max_income=filters["max_income"]
-        )
-
-    except ValueError as error:
-        return str(error), 400
-
-    except Exception:
-        app.logger.exception("Customer search failed")
-        return "Unable to search customers.", 500
-
-
-# ============================================================
-# DOWNLOAD FILTERED CUSTOMERS
-# ============================================================
-
-@app.route("/download-filtered")
-@login_required
-def download_filtered():
-
-    if not os.path.exists(CLUSTERED_FILE):
-        flash("Run K-Means before downloading filtered customers.", "warning")
-        return redirect(url_for("kmeans_page"))
-
-    try:
-        result = get_filtered_customers()
-
-        if result is None:
-            return "The clustered dataset is invalid.", 400
-
-        df, filters = result
-
-        buffer = io.BytesIO()
-
-        df.to_csv(
-            buffer,
-            index=False
-        )
-
-        buffer.seek(0)
-
-        return send_file(
-            buffer,
-            mimetype="text/csv",
-            as_attachment=True,
-            download_name="filtered_customer_segments.csv"
-        )
-
-    except ValueError as error:
-        return str(error), 400
-
-    except Exception:
-        app.logger.exception("Filtered download failed")
-        return "Unable to download filtered customers.", 500
-
-
-# ============================================================
-# CUSTOMER INSIGHTS
-# ============================================================
-
-@app.route("/insights")
-@login_required
-def insights():
-
-    df = get_valid_clustered_data()
-
-    if df is None:
-        flash("Run K-Means before viewing insights.", "warning")
-        return redirect(url_for("kmeans_page"))
-
-    summary = (
-        df.groupby("Segment", as_index=False)
-        .agg(
-            Customers=("Cluster", "size"),
-            Average_Income=(INCOME_COLUMN, "mean"),
-            Average_Spending=(SPENDING_COLUMN, "mean")
-        )
-    )
-
-    summary["Average_Income"] = (
-        summary["Average_Income"].round(2)
-    )
-
-    summary["Average_Spending"] = (
-        summary["Average_Spending"].round(2)
-    )
-
-    insights_list = []
-
-    for _, row in summary.iterrows():
-
-        segment = row["Segment"]
-
-        if segment == "Low Spending":
-            recommendation = (
-                "Consider targeted offers, loyalty rewards, "
-                "and customer feedback to improve engagement."
-            )
-
-        elif segment == "Medium Spending":
-            recommendation = (
-                "Consider personalized product suggestions, "
-                "bundles, and loyalty programs."
-            )
-
-        elif segment == "High Spending":
-            recommendation = (
-                "Consider VIP rewards, exclusive offers, "
-                "and personalized recommendations."
-            )
-
-        else:
-            recommendation = (
-                "Study this group's purchasing behavior "
-                "before choosing a marketing strategy."
-            )
-
-        insights_list.append({
-            "segment": segment,
-            "customers": int(row["Customers"]),
-            "income": float(row["Average_Income"]),
-            "spending": float(row["Average_Spending"]),
-            "recommendation": recommendation
-        })
-
-    summary_table = create_html_table(summary)
-
-    return render_template(
-        "insights.html",
-        total_customers=len(df),
-        total_segments=df["Segment"].nunique(),
-        summary_table=summary_table,
-        insights_list=insights_list
-    )
-
-
-# ============================================================
-# REGISTRATION
-# ============================================================
+# =========================================================
+# REGISTER
+# =========================================================
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-
     if request.method == "POST":
 
-        name = request.form.get(
-            "name",
-            ""
-        ).strip()
-
-        email = request.form.get(
-            "email",
-            ""
-        ).strip().lower()
-
-        password = request.form.get(
-            "password",
-            ""
-        )
+        name = request.form.get("name", "").strip()
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
 
         if not name or not email or not password:
-            flash("Please complete all registration fields.", "warning")
+            flash("Please complete all required fields.", "warning")
             return redirect(url_for("register"))
 
         if len(password) < 8:
             flash(
                 "Password must contain at least 8 characters.",
-                "warning"
+                "warning",
             )
             return redirect(url_for("register"))
 
-        users = load_users()
-
-        if any(
-            user.get("email", "").lower() == email
-            for user in users
-        ):
-            flash("This email is already registered.", "warning")
-            return redirect(url_for("register"))
-
-        users.append({
-            "name": name,
-            "email": email,
-            "password": generate_password_hash(password)
-        })
-
         try:
-            save_users(users)
+            users = read_users()
 
-        except OSError:
-            app.logger.exception("Registration failed")
-            return "Unable to save the new account.", 500
+            if email in users:
+                flash("An account with this email already exists.", "danger")
+                return redirect(url_for("register"))
 
-        flash(
-            "Registration successful. Please log in.",
-            "success"
-        )
+            users[email] = {
+                "name": name,
+                "password": generate_password_hash(password),
+            }
 
-        return redirect(url_for("login"))
+            write_users(users)
+
+            flash(
+                "Registration successful. Please log in.",
+                "success",
+            )
+
+            return redirect(url_for("login"))
+
+        except Exception:
+            logger.exception("Registration failed")
+
+            flash(
+                "Unable to register your account. Please try again.",
+                "danger",
+            )
 
     return render_template("register.html")
 
 
-# ============================================================
+# =========================================================
 # LOGIN
-# ============================================================
+# =========================================================
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-
     if request.method == "POST":
 
-        email = request.form.get(
-            "email",
-            ""
-        ).strip().lower()
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
 
-        password = request.form.get(
-            "password",
-            ""
-        )
+        users = read_users()
 
-        users = load_users()
+        user = users.get(email)
 
-        for user in users:
+        if user and check_password_hash(
+            user.get("password", ""),
+            password,
+        ):
+            session.clear()
 
-            if user.get("email", "").lower() != email:
-                continue
+            session["user"] = email
 
-            stored_password = user.get("password", "")
+            session["user_name"] = user.get("name", email)
 
-            try:
-                valid_password = check_password_hash(
-                    stored_password,
-                    password
-                )
-            except (ValueError, TypeError):
-                valid_password = False
+            flash("Login successful.", "success")
 
-            # Migrate legacy plaintext passwords after successful login.
-            if (
-                not valid_password
-                and stored_password
-                and stored_password == password
-            ):
-                user["password"] = generate_password_hash(password)
+            return redirect(url_for("index"))
 
-                try:
-                    save_users(users)
-                    valid_password = True
-                except OSError:
-                    app.logger.exception(
-                        "Unable to upgrade legacy password"
-                    )
-
-            if valid_password:
-
-                session.clear()
-
-                session["user"] = user.get(
-                    "name",
-                    email
-                )
-
-                return redirect(url_for("index"))
-
-        flash(
-            "Invalid email or password.",
-            "danger"
-        )
-
-        return redirect(url_for("login"))
+        flash("Invalid email or password.", "danger")
 
     return render_template("login.html")
 
 
-# ============================================================
+# =========================================================
 # LOGOUT
-# ============================================================
+# =========================================================
 
 @app.route("/logout")
+@login_required
 def logout():
-
     session.clear()
+
+    flash("You have been logged out.", "success")
 
     return redirect(url_for("home"))
 
 
-# ============================================================
+# =========================================================
 # ERROR HANDLERS
-# ============================================================
+# =========================================================
 
 @app.errorhandler(413)
 def file_too_large(error):
-    flash(
-        "The uploaded file is too large. Maximum size is 10 MB.",
-        "danger"
-    )
+    flash("The uploaded file is too large. Maximum size is 10 MB.", "danger")
     return redirect(url_for("upload"))
 
 
@@ -1388,29 +981,36 @@ def file_too_large(error):
 def page_not_found(error):
     return (
         render_template(
-            "404.html"
-        ) if os.path.exists(
-            os.path.join(BASE_DIR, "templates", "404.html")
-        ) else "Page not found.",
-        404
+            "404.html",
+        ),
+        404,
+    ) if os.path.exists(
+        os.path.join(TEMPLATE_DIR, "404.html")
+    ) else (
+        "Page not found.",
+        404,
     )
 
 
-# ============================================================
-# RUN APPLICATION
-# ============================================================
+@app.errorhandler(500)
+def internal_server_error(error):
+    logger.exception("Internal server error")
+
+    return (
+        "An internal server error occurred. Check the application logs.",
+        500,
+    )
+
+
+# =========================================================
+# RUN APPLICATION LOCALLY
+# =========================================================
 
 if __name__ == "__main__":
-
-    port = int(
-        os.environ.get(
-            "PORT",
-            5000
-        )
-    )
+    port = int(os.environ.get("PORT", 5000))
 
     app.run(
         host="0.0.0.0",
         port=port,
-        debug=False
+        debug=False,
     )
