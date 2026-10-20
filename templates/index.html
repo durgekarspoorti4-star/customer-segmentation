@@ -908,12 +908,14 @@
 </main>
 
 <script>
-    // Data is supplied by the Flask backend.
+document.addEventListener("DOMContentLoaded", function () {
+
+    // Receive chart data from Flask
     const segmentLabels = {{ customer_labels|default([], true)|tojson }};
     const segmentCounts = {{ customer_counts|default([], true)|tojson }};
     const averageScores = {{ segment_spending|default([], true)|tojson }};
 
-    const segmentColors = [
+    const colors = [
         "#6558f5",
         "#20b486",
         "#f59e0b",
@@ -923,11 +925,18 @@
         "#8b5cf6"
     ];
 
-    let spendingChart;
-    let segmentChart;
+    let spendingChart = null;
+    let segmentChart = null;
 
+    // Render spending chart
     function renderSpendingChart(type = "bar") {
+
         const canvas = document.getElementById("spendingChart");
+
+        if (!canvas || typeof Chart === "undefined") {
+            console.error("Spending chart canvas or Chart.js is missing.");
+            return;
+        }
 
         if (spendingChart) {
             spendingChart.destroy();
@@ -940,12 +949,8 @@
                 datasets: [{
                     label: "Average Spending Score",
                     data: averageScores,
-                    backgroundColor: segmentLabels.map(
-                        (_, i) => segmentColors[i % segmentColors.length]
-                    ),
-                    borderColor: segmentLabels.map(
-                        (_, i) => segmentColors[i % segmentColors.length]
-                    ),
+                    backgroundColor: colors.slice(0, segmentLabels.length),
+                    borderColor: colors.slice(0, segmentLabels.length),
                     borderWidth: 2,
                     borderRadius: type === "bar" ? 7 : 0,
                     tension: 0.35,
@@ -966,7 +971,7 @@
                         max: 100,
                         title: {
                             display: true,
-                            text: "Spending Score"
+                            text: "Average Spending Score"
                         }
                     }
                 }
@@ -974,8 +979,19 @@
         });
     }
 
+    // Render segment distribution chart
     function renderSegmentChart() {
+
         const canvas = document.getElementById("segmentChart");
+
+        if (!canvas || typeof Chart === "undefined") {
+            console.error("Segment chart canvas or Chart.js is missing.");
+            return;
+        }
+
+        if (segmentChart) {
+            segmentChart.destroy();
+        }
 
         segmentChart = new Chart(canvas, {
             type: "doughnut",
@@ -984,7 +1000,7 @@
                 datasets: [{
                     data: segmentCounts,
                     backgroundColor: segmentLabels.map(
-                        (_, i) => segmentColors[i % segmentColors.length]
+                        (_, index) => colors[index % colors.length]
                     ),
                     borderWidth: 0,
                     hoverOffset: 5
@@ -1002,16 +1018,24 @@
             }
         });
 
+        // Create segment legend
         const legend = document.getElementById("segmentLegend");
+
+        if (!legend) {
+            return;
+        }
+
         legend.replaceChildren();
 
         const total = segmentCounts.reduce(
-            (sum, value) => sum + Number(value), 0
+            (sum, value) => sum + (Number(value) || 0),
+            0
         );
 
-        segmentLabels.forEach((label, index) => {
-            const count = Number(segmentCounts[index] || 0);
-            const percent = total > 0
+        segmentLabels.forEach(function (label, index) {
+
+            const count = Number(segmentCounts[index]) || 0;
+            const percentage = total > 0
                 ? ((count / total) * 100).toFixed(1)
                 : "0.0";
 
@@ -1021,7 +1045,7 @@
             const dot = document.createElement("span");
             dot.className = "segment-dot";
             dot.style.backgroundColor =
-                segmentColors[index % segmentColors.length];
+                colors[index % colors.length];
 
             const info = document.createElement("div");
             info.className = "segment-info";
@@ -1036,36 +1060,49 @@
 
             const value = document.createElement("span");
             value.className = "segment-count";
-            value.textContent = percent + "%";
+            value.textContent = percentage + "%";
 
             item.append(dot, info, value);
             legend.appendChild(item);
         });
     }
 
-    document.getElementById("chartType").addEventListener(
-        "change",
-        function () {
+    // Chart type selector
+    const chartType = document.getElementById("chartType");
+
+    if (chartType) {
+        chartType.addEventListener("change", function () {
             renderSpendingChart(this.value);
-        }
-    );
+        });
+    }
 
-    document.getElementById("menuToggle").addEventListener(
-        "click",
-        function () {
-            document.getElementById("sidebar").classList.toggle("show");
-        }
-    );
+    // Mobile sidebar toggle
+    const menuToggle = document.getElementById("menuToggle");
+    const sidebar = document.getElementById("sidebar");
 
-    document.getElementById("dateButton").addEventListener(
-        "click",
-        function () {
-            alert("Today's date: " + new Date().toLocaleDateString());
-        }
-    );
+    if (menuToggle && sidebar) {
+        menuToggle.addEventListener("click", function () {
+            sidebar.classList.toggle("show");
+        });
+    }
 
+    // Date button
+    const dateButton = document.getElementById("dateButton");
+
+    if (dateButton) {
+        dateButton.addEventListener("click", function () {
+            alert(
+                "Today's date: " +
+                new Date().toLocaleDateString()
+            );
+        });
+    }
+
+    // Initialize charts
     renderSpendingChart();
     renderSegmentChart();
+
+});
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

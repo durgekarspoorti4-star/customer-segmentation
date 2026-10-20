@@ -1,173 +1,1132 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Customer Search | Customer Segmentation</title>
 
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           rel="stylesheet">
 
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
     <style>
-        body {
-            background: #f4f6fb;
-            font-family: Arial, sans-serif;
+        :root {
+            --primary: #6c63ff;
+            --primary-dark: #5145cd;
+            --sidebar-width: 255px;
+            --background: #f5f6fc;
+            --text-dark: #252642;
+            --text-muted: #777b91;
+            --border: #e9eaf2;
         }
 
-        .header {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 28px;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--background);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+        }
+
+        /* Sidebar */
+
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: #fff;
+            padding: 25px 17px;
+            border-right: 1px solid var(--border);
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 10px 30px;
+        }
+
+        .brand-icon {
+            width: 43px;
+            height: 43px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            border-radius: 13px;
+            background: linear-gradient(135deg, #7768ff, #9b5de5);
+            font-size: 20px;
+        }
+
+        .brand h5 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .brand small {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        .menu-title {
+            color: #a0a2b4;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.4px;
+            padding: 12px 13px;
+        }
+
+        .nav-link-custom {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 12px 14px;
+            margin-bottom: 6px;
+            color: #777b91;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .nav-link-custom i {
+            width: 19px;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        .nav-link-custom:hover {
+            color: var(--primary);
+            background: #f2f0ff;
+        }
+
+        .nav-link-custom.active {
+            color: #fff;
+            background: linear-gradient(135deg, #7768ff, #6555e8);
+            box-shadow: 0 6px 15px rgba(108, 99, 255, 0.2);
+        }
+
+        .sidebar-bottom {
+            margin-top: 35px;
+            padding: 15px;
             border-radius: 14px;
+            background: #f6f5ff;
+        }
+
+        .sidebar-bottom p {
+            color: var(--text-muted);
+            font-size: 11px;
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
+
+        /* Main Content */
+
+        .main {
+            margin-left: var(--sidebar-width);
+            padding: 28px 32px;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
             margin-bottom: 25px;
         }
 
-        .card {
+        .page-heading h4 {
+            margin: 0 0 5px;
+            font-size: 23px;
+            font-weight: 800;
+        }
+
+        .page-heading p {
+            margin: 0;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 13px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .user-avatar {
+            width: 37px;
+            height: 37px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 11px;
+            background: #eceaff;
+            color: var(--primary);
+        }
+
+        .user-profile strong {
+            display: block;
+            font-size: 12px;
+        }
+
+        .user-profile small {
+            color: var(--text-muted);
+            font-size: 10px;
+        }
+
+        .mobile-toggle {
+            display: none;
             border: none;
+            border-radius: 9px;
+            background: #fff;
+            padding: 9px 12px;
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        /* Hero */
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+            padding: 30px;
+            margin-bottom: 25px;
+            color: #fff;
+            border-radius: 20px;
+            background: linear-gradient(120deg, #6558e8, #8e61d5, #a36ad8);
+            box-shadow: 0 12px 30px rgba(108, 99, 255, 0.17);
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            width: 210px;
+            height: 210px;
+            right: -55px;
+            top: -85px;
+            border: 35px solid rgba(255,255,255,0.09);
+            border-radius: 50%;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 11px;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.16);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.7px;
+            text-transform: uppercase;
+        }
+
+        .hero h2 {
+            margin: 15px 0 9px;
+            font-size: clamp(23px, 3vw, 30px);
+            font-weight: 800;
+        }
+
+        .hero p {
+            max-width: 600px;
+            margin-bottom: 0;
+            color: rgba(255,255,255,0.86);
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        /* Cards */
+
+        .stat-card,
+        .content-card {
+            height: 100%;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 4px 18px rgba(40, 42, 80, 0.025);
+        }
+
+        .stat-card {
+            padding: 21px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .stat-icon {
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             border-radius: 14px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+            font-size: 19px;
+        }
+
+        .icon-purple {
+            background: #eeebff;
+            color: #7464ed;
+        }
+
+        .icon-blue {
+            background: #e7f2ff;
+            color: #3887e8;
+        }
+
+        .icon-green {
+            background: #e5f8ef;
+            color: #21a56b;
+        }
+
+        .icon-orange {
+            background: #fff0e2;
+            color: #ed963e;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 800;
+            margin: 0;
+            overflow-wrap: anywhere;
+        }
+
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .section-title h5 {
+            margin: 0 0 5px;
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .section-title p {
+            margin: 0;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .content-card {
+            padding: 25px;
+            margin-bottom: 24px;
+        }
+
+        /* Form */
+
+        .form-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #454760;
+            margin-bottom: 8px;
+        }
+
+        .form-control,
+        .form-select {
+            min-height: 45px;
+            border: 1px solid #e4e5ef;
+            border-radius: 10px;
+            font-size: 12px;
+            box-shadow: none !important;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary);
+        }
+
+        .input-group-text {
+            background: #f7f7fc;
+            border-color: #e4e5ef;
+            color: #8b8da2;
+            border-radius: 10px 0 0 10px;
+        }
+
+        .input-group .form-control {
+            border-radius: 0 10px 10px 0;
+        }
+
+        .filter-note {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            padding: 13px 15px;
+            margin-top: 20px;
+            background: #f5f4ff;
+            color: #68618f;
+            border-radius: 10px;
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        .btn {
+            min-height: 41px;
+            border-radius: 9px;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 10px 16px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        /* Table */
+
+        .table-tools {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .table-search {
+            width: min(100%, 280px);
+            position: relative;
+        }
+
+        .table-search i {
+            position: absolute;
+            left: 13px;
+            top: 15px;
+            color: #a0a2b4;
+            font-size: 12px;
+        }
+
+        .table-search input {
+            padding-left: 35px;
+        }
+
+        .result-badge {
+            padding: 8px 12px;
+            border-radius: 30px;
+            background: #eeebff;
+            color: #6655db;
+            font-size: 11px;
+            font-weight: 800;
+            white-space: nowrap;
         }
 
         .table-responsive {
-            max-height: 550px;
+            max-height: 520px;
             overflow: auto;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .table {
+            margin-bottom: 0;
+            vertical-align: middle;
+            font-size: 12px;
+        }
+
+        .table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            padding: 14px;
+            background: #f6f5ff;
+            color: #595b78;
+            border-bottom: 1px solid #e9e7ff;
+            white-space: nowrap;
+            font-size: 11px;
+        }
+
+        .table tbody td {
+            padding: 13px 14px;
+            color: #555871;
+            white-space: nowrap;
+        }
+
+        .table tbody tr:hover td {
+            background: #faf9ff;
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .empty-state {
+            display: none;
+            padding: 35px 15px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .empty-state i {
+            display: block;
+            margin-bottom: 12px;
+            color: #aaa3e9;
+            font-size: 30px;
+        }
+
+        .table-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 17px;
+        }
+
+        .table-footer small {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        .footer {
+            padding: 10px 0 0;
+            text-align: center;
+            color: #9294a8;
+            font-size: 10px;
+        }
+
+        /* Responsive */
+
+        @media (max-width: 1100px) {
+            .main {
+                padding: 24px 20px;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+                box-shadow: 10px 0 30px rgba(20,20,50,0.12);
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .mobile-toggle {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .main {
+                padding: 17px 12px;
+            }
+
+            .page-heading h4 {
+                font-size: 18px;
+            }
+
+            .page-heading p {
+                font-size: 10px;
+            }
+
+            .user-profile .user-info {
+                display: none;
+            }
+
+            .hero {
+                padding: 23px 20px;
+            }
+
+            .content-card {
+                padding: 18px;
+            }
+
+            .stat-card {
+                padding: 16px;
+            }
+
+            .stat-value {
+                font-size: 19px;
+            }
+
+            .table-tools {
+                align-items: stretch;
+            }
+
+            .table-search {
+                width: 100%;
+            }
         }
     </style>
 </head>
 
 <body>
-<div class="container py-4">
 
-    <div class="header">
-        <h2>Customer Search &amp; Filter</h2>
-        <p class="mb-0">
-            Search and filter customers from your segmentation results.
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+
+    <div class="brand">
+        <div class="brand-icon">
+            <i class="fa-solid fa-chart-pie"></i>
+        </div>
+
+        <div>
+            <h5>Customer Insights</h5>
+            <small>AI Analytics Platform</small>
+        </div>
+    </div>
+
+    <div class="menu-title">MAIN MENU</div>
+
+    <a href="{{ url_for('index') }}" class="nav-link-custom">
+        <i class="fa-solid fa-house"></i>
+        Dashboard
+    </a>
+
+    <a href="{{ url_for('analysis') }}" class="nav-link-custom">
+        <i class="fa-solid fa-database"></i>
+        Data Analysis
+    </a>
+
+    <a href="{{ url_for('upload') }}" class="nav-link-custom">
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        Upload Dataset
+    </a>
+
+    <a href="{{ url_for('kmeans_page') }}" class="nav-link-custom">
+        <i class="fa-solid fa-diagram-project"></i>
+        K-Means Clustering
+    </a>
+
+    <a href="{{ url_for('results') }}" class="nav-link-custom">
+        <i class="fa-solid fa-chart-column"></i>
+        Clustering Results
+    </a>
+
+    <a href="{{ url_for('segments') }}" class="nav-link-custom">
+        <i class="fa-solid fa-users"></i>
+        Customer Segments
+    </a>
+
+    <a href="{{ url_for('prediction') }}" class="nav-link-custom">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        Prediction
+    </a>
+
+    <a href="{{ url_for('search_customers') }}"
+       class="nav-link-custom active"
+       aria-current="page">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        Search Customers
+    </a>
+
+    <a href="{{ url_for('insights') }}" class="nav-link-custom">
+        <i class="fa-solid fa-lightbulb"></i>
+        Business Insights
+    </a>
+
+    <div class="menu-title mt-3">ACCOUNT</div>
+
+    <a href="{{ url_for('logout') }}" class="nav-link-custom">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        Logout
+    </a>
+
+    <div class="sidebar-bottom">
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <i class="fa-solid fa-circle-info text-primary"></i>
+            <strong style="font-size: 11px;">Smart Customer Analytics</strong>
+        </div>
+
+        <p>
+            Explore customer records, apply filters, and identify spending
+            patterns using your segmentation results.
         </p>
     </div>
 
-    <div class="mb-3">
-        <a href="{{ url_for('index') }}" class="btn btn-secondary">
-            Back to Dashboard
-        </a>
+</aside>
 
-        <a href="{{ url_for('results') }}" class="btn btn-primary">
-            View Results
-        </a>
+<!-- Main Content -->
+<main class="main">
 
-        <a href="{{ url_for('insights') }}" class="btn btn-warning">
-            Customer Insights
-        </a>
-    </div>
+    <!-- Topbar -->
+    <header class="topbar">
 
-    <div class="card p-4 mb-4">
-        <form method="GET" action="{{ url_for('search_customers') }}">
-            <div class="row g-3">
+        <div class="d-flex align-items-center gap-3">
+            <button class="mobile-toggle"
+                    id="menuToggle"
+                    type="button"
+                    aria-label="Toggle navigation"
+                    aria-expanded="false">
+                <i class="fa-solid fa-bars"></i>
+            </button>
 
-                <div class="col-md-4">
-                    <label class="form-label">Customer ID</label>
-                    <input type="text"
-                           name="customer_id"
-                           class="form-control"
-                           value="{{ customer_id }}"
-                           placeholder="Enter customer ID">
+            <div class="page-heading">
+                <h4>Customer Search</h4>
+                <p>Find and filter customer records easily.</p>
+            </div>
+        </div>
+
+        <div class="user-profile">
+            <div class="user-avatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
+
+            <div class="user-info">
+                <strong>{{ session.get('user', 'User') }}</strong>
+                <small>Project Workspace</small>
+            </div>
+        </div>
+
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+
+        <div class="hero-content">
+            <span class="hero-label">
+                <i class="fa-solid fa-magnifying-glass-chart"></i>
+                Customer Explorer
+            </span>
+
+            <h2>Search. Filter. Discover.</h2>
+
+            <p>
+                Quickly find customers using their ID, spending segment, age,
+                and annual income. Review matching records and download the
+                filtered results for further analysis.
+            </p>
+        </div>
+
+    </section>
+
+    <!-- Statistics -->
+    <section class="row g-3 mb-4">
+
+        <div class="col-12 col-sm-6 col-xl-4">
+            <div class="stat-card">
+                <div class="stat-icon icon-purple">
+                    <i class="fa-solid fa-users"></i>
                 </div>
 
-                <div class="col-md-4">
-                    <label class="form-label">Customer Segment</label>
-                    <select name="segment" class="form-select">
+                <div>
+                    <div class="stat-label">Matching Customers</div>
+                    <h3 class="stat-value">{{ result_count | default(0) }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-4">
+            <div class="stat-card">
+                <div class="stat-icon icon-blue">
+                    <i class="fa-solid fa-filter"></i>
+                </div>
+
+                <div>
+                    <div class="stat-label">Selected Segment</div>
+                    <h3 class="stat-value" style="font-size: 17px;">
+                        {{ selected_segment | default('All') }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-4">
+            <div class="stat-card">
+                <div class="stat-icon icon-green">
+                    <i class="fa-solid fa-file-csv"></i>
+                </div>
+
+                <div>
+                    <div class="stat-label">Export Option</div>
+                    <h3 class="stat-value" style="font-size: 17px;">
+                        CSV Download
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- Filter Form -->
+    <section class="content-card">
+
+        <div class="section-title">
+            <div>
+                <h5>
+                    <i class="fa-solid fa-sliders text-primary me-2"></i>
+                    Search & Filter Customers
+                </h5>
+
+                <p>Enter one or more conditions to narrow down your results.</p>
+            </div>
+
+            <span class="badge rounded-pill text-bg-light p-2">
+                <i class="fa-solid fa-filter me-1"></i>
+                Advanced Filters
+            </span>
+        </div>
+
+        <form method="GET" action="{{ url_for('search_customers') }}">
+
+            <div class="row g-3">
+
+                <!-- Customer ID -->
+                <div class="col-12 col-md-6 col-xl-4">
+                    <label for="customer_id" class="form-label">
+                        Customer ID
+                    </label>
+
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fa-solid fa-id-card"></i>
+                        </span>
+
+                        <input type="text"
+                               id="customer_id"
+                               name="customer_id"
+                               class="form-control"
+                               value="{{ customer_id | default('') }}"
+                               placeholder="Enter customer ID">
+                    </div>
+                </div>
+
+                <!-- Segment -->
+                <div class="col-12 col-md-6 col-xl-4">
+                    <label for="segment" class="form-label">
+                        Customer Segment
+                    </label>
+
+                    <select name="segment" id="segment" class="form-select">
+
                         <option value="All"
-                            {% if selected_segment == "All" %}selected{% endif %}>
+                            {% if selected_segment | default('All') == 'All' %}
+                                selected
+                            {% endif %}>
                             All Segments
                         </option>
 
                         <option value="Low Spending"
-                            {% if selected_segment == "Low Spending" %}selected{% endif %}>
+                            {% if selected_segment | default('All') == 'Low Spending' %}
+                                selected
+                            {% endif %}>
                             Low Spending
                         </option>
 
                         <option value="Medium Spending"
-                            {% if selected_segment == "Medium Spending" %}selected{% endif %}>
+                            {% if selected_segment | default('All') == 'Medium Spending' %}
+                                selected
+                            {% endif %}>
                             Medium Spending
                         </option>
 
                         <option value="High Spending"
-                            {% if selected_segment == "High Spending" %}selected{% endif %}>
+                            {% if selected_segment | default('All') == 'High Spending' %}
+                                selected
+                            {% endif %}>
                             High Spending
                         </option>
+
                     </select>
                 </div>
 
-                <div class="col-md-4">
-                    <label class="form-label">Minimum Age</label>
-                    <input type="number" name="min_age"
-                           class="form-control" min="0"
-                           value="{{ min_age }}">
+                <!-- Minimum Age -->
+                <div class="col-12 col-md-6 col-xl-4">
+                    <label for="min_age" class="form-label">
+                        Minimum Age
+                    </label>
+
+                    <input type="number"
+                           id="min_age"
+                           name="min_age"
+                           class="form-control"
+                           min="0"
+                           max="120"
+                           value="{{ min_age | default('') }}"
+                           placeholder="e.g. 18">
                 </div>
 
-                <div class="col-md-4">
-                    <label class="form-label">Maximum Age</label>
-                    <input type="number" name="max_age"
-                           class="form-control" min="0"
-                           value="{{ max_age }}">
+                <!-- Maximum Age -->
+                <div class="col-12 col-md-6 col-xl-4">
+                    <label for="max_age" class="form-label">
+                        Maximum Age
+                    </label>
+
+                    <input type="number"
+                           id="max_age"
+                           name="max_age"
+                           class="form-control"
+                           min="0"
+                           max="120"
+                           value="{{ max_age | default('') }}"
+                           placeholder="e.g. 60">
                 </div>
 
-                <div class="col-md-4">
-                    <label class="form-label">Minimum Annual Income (k$)</label>
-                    <input type="number" name="min_income"
-                           class="form-control" min="0"
-                           value="{{ min_income }}">
+                <!-- Minimum Income -->
+                <div class="col-12 col-md-6 col-xl-4">
+                    <label for="min_income" class="form-label">
+                        Minimum Annual Income (k$)
+                    </label>
+
+                    <input type="number"
+                           id="min_income"
+                           name="min_income"
+                           class="form-control"
+                           min="0"
+                           step="any"
+                           value="{{ min_income | default('') }}"
+                           placeholder="Minimum income">
                 </div>
 
-                <div class="col-md-4">
-                    <label class="form-label">Maximum Annual Income (k$)</label>
-                    <input type="number" name="max_income"
-                           class="form-control" min="0"
-                           value="{{ max_income }}">
-                </div>
+                <!-- Maximum Income -->
+                <div class="col-12 col-md-6 col-xl-4">
+                    <label for="max_income" class="form-label">
+                        Maximum Annual Income (k$)
+                    </label>
 
-                <div class="col-12">
-                    <button type="submit" class="btn btn-primary">
-                        Search Customers
-                    </button>
-
-                    <a href="{{ url_for('search_customers') }}"
-                       class="btn btn-outline-secondary">
-                        Clear Filters
-                    </a>
+                    <input type="number"
+                           id="max_income"
+                           name="max_income"
+                           class="form-control"
+                           min="0"
+                           step="any"
+                           value="{{ max_income | default('') }}"
+                           placeholder="Maximum income">
                 </div>
 
             </div>
+
+            <div class="filter-note">
+                <i class="fa-solid fa-circle-info mt-1"></i>
+
+                <div>
+                    <strong>Tip:</strong>
+                    Combine multiple filters to find specific customers.
+                    Leave a field empty if you do not want to filter by that
+                    condition. The results depend on your uploaded and
+                    clustered dataset.
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mt-4">
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-magnifying-glass me-2"></i>
+                    Search Customers
+                </button>
+
+                <a href="{{ url_for('search_customers') }}"
+                   class="btn btn-outline-secondary">
+                    <i class="fa-solid fa-rotate-left me-2"></i>
+                    Clear Filters
+                </a>
+
+                <a href="{{ url_for('results') }}"
+                   class="btn btn-outline-primary">
+                    <i class="fa-solid fa-chart-column me-2"></i>
+                    View Clustering Results
+                </a>
+
+            </div>
+
         </form>
-    </div>
 
-    <div class="card p-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="mb-0">Customer Records</h5>
+    </section>
 
-            <span class="badge bg-primary">
-                {{ result_count }} customers
+    <!-- Customer Records -->
+    <section class="content-card">
+
+        <div class="section-title">
+            <div>
+                <h5>
+                    <i class="fa-solid fa-table-list text-primary me-2"></i>
+                    Customer Records
+                </h5>
+
+                <p>Review the customers matching your selected filters.</p>
+            </div>
+
+            <span class="result-badge">
+                <i class="fa-solid fa-users me-1"></i>
+                {{ result_count | default(0) }} Records
             </span>
         </div>
 
-        <div class="table-responsive">
-            {{ customer_table|safe }}
+        <!-- Client-side table search -->
+        <div class="table-tools">
+
+            <div class="table-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input type="search"
+                       id="tableSearch"
+                       class="form-control"
+                       placeholder="Search visible records..."
+                       aria-label="Search visible customer records">
+            </div>
+
+            <small class="text-muted" style="font-size: 11px;">
+                <i class="fa-solid fa-circle-check text-success me-1"></i>
+                Filtered dataset
+            </small>
+
         </div>
 
-        <div class="mt-3">
+        <div class="table-responsive" id="customerTableContainer">
+            {{ customer_table | safe }}
+        </div>
+
+        <div class="empty-state" id="emptyState">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <strong class="d-block mb-2">No matching rows found</strong>
+            <span>Try a different search term.</span>
+        </div>
+
+        <div class="table-footer">
+
+            <small id="visibleCount">
+                Showing the customer records returned by the filters.
+            </small>
+
             <a href="{{ url_for('download_filtered',
-                customer_id=customer_id,
-                segment=selected_segment,
-                min_age=min_age,
-                max_age=max_age,
-                min_income=min_income,
-                max_income=max_income) }}"
+                       customer_id=customer_id | default(''),
+                       segment=selected_segment | default('All'),
+                       min_age=min_age | default(''),
+                       max_age=max_age | default(''),
+                       min_income=min_income | default(''),
+                       max_income=max_income | default('')) }}"
                class="btn btn-success">
-                Download Customer CSV
-            </a>
-        </div>
-    </div>
 
-</div>
+                <i class="fa-solid fa-file-csv me-2"></i>
+                Download Filtered CSV
+
+            </a>
+
+        </div>
+
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        Customer Segmentation | AI Analytics
+        <span class="mx-2">•</span>
+        Customer Search & Filter
+    </footer>
+
+</main>
+
+<!-- JavaScript -->
+<script>
+    // Mobile sidebar toggle
+    const sidebar = document.getElementById("sidebar");
+    const menuToggle = document.getElementById("menuToggle");
+
+    menuToggle.addEventListener("click", function () {
+        const isOpen = sidebar.classList.toggle("open");
+        menuToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+
+    // Close the sidebar after selecting a navigation item on mobile
+    document.querySelectorAll(".nav-link-custom").forEach(function (link) {
+        link.addEventListener("click", function () {
+            if (window.innerWidth <= 1100) {
+                sidebar.classList.remove("open");
+                menuToggle.setAttribute("aria-expanded", "false");
+            }
+        });
+    });
+
+    // Search currently displayed table rows
+    const tableSearch = document.getElementById("tableSearch");
+    const tableContainer = document.getElementById("customerTableContainer");
+    const emptyState = document.getElementById("emptyState");
+    const visibleCount = document.getElementById("visibleCount");
+
+    function filterVisibleRows() {
+        const table = tableContainer.querySelector("table");
+
+        if (!table) {
+            visibleCount.textContent = "No customer table was provided.";
+            emptyState.style.display = "block";
+            return;
+        }
+
+        table.classList.add("table", "table-hover");
+
+        if (table.tHead) {
+            table.tHead.classList.add("table-light");
+        }
+
+        const rows = Array.from(table.querySelectorAll("tbody tr"));
+        const query = tableSearch.value.trim().toLowerCase();
+
+        let visibleRows = 0;
+
+        rows.forEach(function (row) {
+            const matches = row.innerText.toLowerCase().includes(query);
+
+            row.style.display = matches ? "" : "none";
+
+            if (matches) {
+                visibleRows++;
+            }
+        });
+
+        emptyState.style.display =
+            visibleRows === 0 ? "block" : "none";
+
+        visibleCount.textContent =
+            "Showing " + visibleRows + " of " + rows.length +
+            " rows currently displayed.";
+    }
+
+    tableSearch.addEventListener("input", filterVisibleRows);
+
+    // Initialize the table styling and row count
+    filterVisibleRows();
+</script>
+
 </body>
 </html>

@@ -1,98 +1,1180 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Upload Dataset</title>
+    <title>Upload Dataset | Customer Insights</title>
 
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
 
     <style>
+        :root {
+            --primary: #6c63ff;
+            --primary-dark: #5145cd;
+            --background: #f5f6fc;
+            --text-dark: #252642;
+            --text-muted: #777b91;
+            --border: #e9eaf2;
+            --sidebar-width: 255px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            background: #f4f6f9;
-            font-family: Arial, sans-serif;
+            margin: 0;
+            background: var(--background);
+            color: var(--text-dark);
+            font-family: 'Inter', sans-serif;
         }
 
-        .upload-card {
-            max-width: 650px;
-            margin: 100px auto;
-            background: white;
-            padding: 40px;
-            border-radius: 18px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        /* Sidebar */
+
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 25px 17px;
+            background: #fff;
+            border-right: 1px solid var(--border);
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
         }
 
-        .upload-box {
-            border: 2px dashed #aaa;
-            padding: 50px 20px;
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 10px 30px;
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 13px;
+            color: #fff;
+            font-size: 20px;
+            background: linear-gradient(135deg, #7768ff, #9b5de5);
+        }
+
+        .brand h5 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .brand small {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        .menu-title {
+            padding: 12px 13px;
+            color: #a0a2b4;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.4px;
+        }
+
+        .nav-link-custom {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 12px 14px;
+            margin-bottom: 6px;
+            border-radius: 10px;
+            color: #777b91;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .nav-link-custom i {
+            width: 19px;
             text-align: center;
-            border-radius: 15px;
+            font-size: 15px;
         }
 
-        .upload-box:hover {
-            border-color: #0d6efd;
+        .nav-link-custom:hover {
+            color: var(--primary);
+            background: #f2f0ff;
+        }
+
+        .nav-link-custom.active {
+            color: #fff;
+            background: linear-gradient(135deg, #7768ff, #6555e8);
+            box-shadow: 0 6px 15px rgba(108, 99, 255, 0.2);
+        }
+
+        .sidebar-note {
+            margin-top: 30px;
+            padding: 15px;
+            border-radius: 13px;
+            background: #f6f5ff;
+        }
+
+        .sidebar-note strong {
+            font-size: 11px;
+        }
+
+        .sidebar-note p {
+            margin: 8px 0 0;
+            color: var(--text-muted);
+            font-size: 10px;
+            line-height: 1.7;
+        }
+
+        /* Main */
+
+        .main {
+            min-height: 100vh;
+            margin-left: var(--sidebar-width);
+            padding: 28px 32px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .page-heading h4 {
+            margin: 0 0 5px;
+            font-size: 23px;
+            font-weight: 800;
+        }
+
+        .page-heading p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 13px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #fff;
+        }
+
+        .user-avatar {
+            width: 37px;
+            height: 37px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 11px;
+            background: #eceaff;
+            color: var(--primary);
+        }
+
+        .user-profile strong {
+            display: block;
+            font-size: 12px;
+        }
+
+        .user-profile small {
+            color: var(--text-muted);
+            font-size: 10px;
+        }
+
+        .mobile-toggle {
+            display: none;
+            padding: 9px 12px;
+            border: none;
+            border-radius: 9px;
+            background: #fff;
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        /* Hero */
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+            padding: 30px;
+            margin-bottom: 25px;
+            color: #fff;
+            border-radius: 20px;
+            background: linear-gradient(120deg, #6558e8, #8e61d5, #a36ad8);
+            box-shadow: 0 12px 30px rgba(108, 99, 255, 0.16);
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            top: -85px;
+            right: -55px;
+            width: 220px;
+            height: 220px;
+            border: 35px solid rgba(255, 255, 255, 0.09);
+            border-radius: 50%;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 12px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.16);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+
+        .hero h2 {
+            margin: 15px 0 9px;
+            font-size: clamp(24px, 3vw, 31px);
+            font-weight: 800;
+        }
+
+        .hero p {
+            max-width: 650px;
+            margin: 0;
+            color: rgba(255, 255, 255, 0.88);
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        /* Cards */
+
+        .content-card {
+            padding: 27px;
+            margin-bottom: 24px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            box-shadow: 0 4px 18px rgba(40, 42, 80, 0.025);
+        }
+
+        .section-title {
+            margin-bottom: 23px;
+        }
+
+        .section-title h5 {
+            margin: 0 0 6px;
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .section-title p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        /* Upload area */
+
+        .upload-zone {
+            position: relative;
+            padding: 42px 22px;
+            text-align: center;
+            border: 2px dashed #d8d5ff;
+            border-radius: 17px;
+            background: #faf9ff;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            border-color: var(--primary);
+            background: #f3f1ff;
+        }
+
+        .upload-icon {
+            width: 76px;
+            height: 76px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            border-radius: 23px;
+            background: #eceaff;
+            color: var(--primary);
+            font-size: 30px;
+        }
+
+        .upload-zone h5 {
+            margin-bottom: 9px;
+            font-size: 17px;
+            font-weight: 800;
+        }
+
+        .upload-zone p {
+            margin-bottom: 15px;
+            color: var(--text-muted);
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .browse-label {
+            display: inline-block;
+            padding: 10px 17px;
+            margin-bottom: 15px;
+            border-radius: 9px;
+            color: #fff;
+            background: var(--primary);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .browse-label:hover {
+            background: var(--primary-dark);
+        }
+
+        .file-requirements {
+            color: #8b8da2;
+            font-size: 10px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* Selected file */
+
+        .selected-file {
+            display: none;
+            align-items: center;
+            gap: 13px;
+            padding: 15px;
+            margin-top: 18px;
+            border: 1px solid #dcd8ff;
+            border-radius: 12px;
+            background: #f8f7ff;
+        }
+
+        .csv-icon {
+            width: 43px;
+            height: 43px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border-radius: 11px;
+            background: #e3f8ed;
+            color: #15966a;
+            font-size: 18px;
+        }
+
+        .file-details {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .file-details strong {
+            display: block;
+            overflow-wrap: anywhere;
+            font-size: 12px;
+        }
+
+        .file-details small {
+            color: var(--text-muted);
+            font-size: 10px;
+        }
+
+        .remove-file {
+            border: none;
+            background: transparent;
+            color: #e05252;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* Buttons */
+
+        .btn {
+            min-height: 42px;
+            padding: 11px 17px;
+            border-radius: 9px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .upload-submit {
+            width: 100%;
+            min-height: 48px;
+            margin-top: 22px;
+            font-size: 13px;
+        }
+
+        .upload-submit:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        /* Instructions */
+
+        .step-card {
+            display: flex;
+            gap: 14px;
+            padding: 18px;
+            height: 100%;
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            background: #fff;
+        }
+
+        .step-number {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            border-radius: 11px;
+            background: #eeebff;
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .step-card h6 {
+            margin: 2px 0 7px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .step-card p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 10px;
+            line-height: 1.8;
+        }
+
+        .requirements-card {
+            padding: 20px;
+            border-radius: 14px;
+            background: #f8f7ff;
+            border: 1px solid #e8e5ff;
+        }
+
+        .requirements-card h6 {
+            margin-bottom: 14px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .requirement-item {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            color: #555871;
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        .requirement-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .requirement-item i {
+            margin-top: 3px;
+            color: #20a56b;
+        }
+
+        .alert {
+            border-radius: 11px;
+            font-size: 12px;
+        }
+
+        .footer {
+            padding: 10px 0 20px;
+            text-align: center;
+            color: #9294a8;
+            font-size: 10px;
+        }
+
+        @media (max-width: 1100px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+                box-shadow: 10px 0 30px rgba(20, 20, 50, 0.12);
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 24px 20px;
+            }
+
+            .mobile-toggle {
+                display: inline-flex;
+                justify-content: center;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .main {
+                padding: 17px 12px;
+            }
+
+            .page-heading h4 {
+                font-size: 18px;
+            }
+
+            .page-heading p {
+                font-size: 10px;
+            }
+
+            .user-profile .user-info {
+                display: none;
+            }
+
+            .hero {
+                padding: 23px 20px;
+            }
+
+            .content-card {
+                padding: 19px;
+            }
+
+            .upload-zone {
+                padding: 30px 15px;
+            }
         }
     </style>
 </head>
 
 <body>
 
-<div class="container">
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
 
-    <div class="upload-card">
+    <div class="brand">
+        <div class="brand-icon">
+            <i class="fa-solid fa-chart-pie"></i>
+        </div>
 
-        <h2 class="text-center mb-3">
-            📁 Upload Customer Dataset
-        </h2>
+        <div>
+            <h5>Customer Insights</h5>
+            <small>AI Analytics Platform</small>
+        </div>
+    </div>
 
-        <p class="text-center text-muted">
-            Upload a CSV file containing customer information.
+    <div class="menu-title">MAIN MENU</div>
+
+    <a href="{{ url_for('index') }}" class="nav-link-custom">
+        <i class="fa-solid fa-house"></i>
+        Dashboard
+    </a>
+
+    <a href="{{ url_for('analysis') }}" class="nav-link-custom">
+        <i class="fa-solid fa-database"></i>
+        Data Analysis
+    </a>
+
+    <a href="{{ url_for('upload') }}"
+       class="nav-link-custom active"
+       aria-current="page">
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        Upload Dataset
+    </a>
+
+    <a href="{{ url_for('kmeans_page') }}" class="nav-link-custom">
+        <i class="fa-solid fa-diagram-project"></i>
+        K-Means Clustering
+    </a>
+
+    <a href="{{ url_for('results') }}" class="nav-link-custom">
+        <i class="fa-solid fa-chart-column"></i>
+        Clustering Results
+    </a>
+
+    <a href="{{ url_for('segments') }}" class="nav-link-custom">
+        <i class="fa-solid fa-users"></i>
+        Customer Segments
+    </a>
+
+    <a href="{{ url_for('prediction') }}" class="nav-link-custom">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        Prediction
+    </a>
+
+    <a href="{{ url_for('search_customers') }}" class="nav-link-custom">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        Search Customers
+    </a>
+
+    <a href="{{ url_for('insights') }}" class="nav-link-custom">
+        <i class="fa-solid fa-lightbulb"></i>
+        Business Insights
+    </a>
+
+    <div class="menu-title mt-3">ACCOUNT</div>
+
+    <a href="{{ url_for('logout') }}" class="nav-link-custom">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        Logout
+    </a>
+
+    <div class="sidebar-note">
+        <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-circle-info text-primary"></i>
+            <strong>Dataset Upload</strong>
+        </div>
+
+        <p>
+            Upload a valid customer CSV file before performing data analysis
+            and K-Means clustering.
         </p>
+    </div>
 
-        <form
-            action="/upload"
-            method="POST"
-            enctype="multipart/form-data"
-        >
+</aside>
 
-            <div class="upload-box">
+<!-- Main Content -->
+<main class="main">
 
-                <h5>Select CSV File</h5>
+    <!-- Topbar -->
+    <header class="topbar">
 
-                <input
-                    type="file"
-                    name="file"
-                    class="form-control mt-3"
-                    accept=".csv"
-                    required
-                >
+        <div class="d-flex align-items-center gap-3">
 
-                <button
-                    type="submit"
-                    class="btn btn-primary mt-4"
-                >
-                    Upload Dataset
-                </button>
+            <button class="mobile-toggle"
+                    id="menuToggle"
+                    type="button"
+                    aria-label="Toggle navigation"
+                    aria-expanded="false">
+                <i class="fa-solid fa-bars"></i>
+            </button>
 
+            <div class="page-heading">
+                <h4>Upload Dataset</h4>
+                <p>Import your customer data to begin the analysis.</p>
             </div>
 
-        </form>
+        </div>
 
-        <div class="text-center mt-4">
+        <div class="user-profile">
+            <div class="user-avatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
 
-            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
-                ← Back to Dashboard
-            </a>
+            <div class="user-info">
+                <strong>{{ session.get('user', 'User') }}</strong>
+                <small>Project Workspace</small>
+            </div>
+        </div>
+
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <span class="hero-label">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                Dataset Management
+            </span>
+
+            <h2>Upload Your Customer Dataset</h2>
+
+            <p>
+                Start your customer segmentation workflow by uploading a CSV
+                file. Once uploaded, you can explore the dataset, analyze
+                customer behaviour, and perform K-Means clustering.
+            </p>
+
+        </div>
+
+    </section>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category if category in ['success', 'danger', 'warning', 'info', 'primary', 'secondary'] else 'info' }} alert-dismissible fade show"
+                     role="alert">
+                    <i class="fa-solid fa-circle-info me-2"></i>
+                    {{ message }}
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Close">
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row g-4">
+
+        <!-- Upload Form -->
+        <div class="col-12 col-xl-7">
+
+            <section class="content-card">
+
+                <div class="section-title">
+                    <h5>
+                        <i class="fa-solid fa-file-csv text-primary me-2"></i>
+                        Choose Your CSV File
+                    </h5>
+
+                    <p>
+                        Select a file from your computer or drag it into
+                        the upload area.
+                    </p>
+                </div>
+
+                <form action="{{ url_for('upload') }}"
+                      method="POST"
+                      enctype="multipart/form-data"
+                      id="uploadForm">
+
+                    <div class="upload-zone"
+                         id="uploadZone"
+                         role="button"
+                         tabindex="0"
+                         aria-label="Choose a CSV file">
+
+                        <div class="upload-icon">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                        </div>
+
+                        <h5>Drop your CSV file here</h5>
+
+                        <p>
+                            Drag and drop your dataset into this area,
+                            or select a file from your computer.
+                        </p>
+
+                        <label for="datasetFile" class="browse-label">
+                            <i class="fa-solid fa-folder-open me-2"></i>
+                            Browse Files
+                        </label>
+
+                        <input type="file"
+                               name="file"
+                               id="datasetFile"
+                               class="file-input"
+                               accept=".csv,text/csv"
+                               required>
+
+                        <div class="file-requirements">
+                            <i class="fa-solid fa-file-csv me-1"></i>
+                            CSV format only
+                        </div>
+
+                    </div>
+
+                    <!-- Selected File Details -->
+                    <div class="selected-file" id="selectedFile">
+
+                        <div class="csv-icon">
+                            <i class="fa-solid fa-file-csv"></i>
+                        </div>
+
+                        <div class="file-details">
+                            <strong id="fileName">No file selected</strong>
+                            <small id="fileSize">0 KB</small>
+                        </div>
+
+                        <button type="button"
+                                class="remove-file"
+                                id="removeFile"
+                                aria-label="Remove selected file">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+
+                    </div>
+
+                    <button type="submit"
+                            class="btn btn-primary upload-submit"
+                            id="uploadButton"
+                            disabled>
+
+                        <i class="fa-solid fa-cloud-arrow-up me-2"></i>
+                        Upload Customer Dataset
+
+                    </button>
+
+                    <p class="text-muted text-center mt-3 mb-0"
+                       style="font-size:10px;line-height:1.7;">
+                        Please verify your CSV columns before uploading.
+                        The server must validate the file contents.
+                    </p>
+
+                </form>
+
+            </section>
+
+        </div>
+
+        <!-- Requirements -->
+        <div class="col-12 col-xl-5">
+
+            <section class="content-card">
+
+                <div class="section-title">
+                    <h5>
+                        <i class="fa-solid fa-list-check text-primary me-2"></i>
+                        Dataset Requirements
+                    </h5>
+
+                    <p>
+                        Prepare your file for successful analysis.
+                    </p>
+                </div>
+
+                <div class="requirements-card">
+
+                    <h6>
+                        <i class="fa-solid fa-circle-check text-success me-2"></i>
+                        Recommended Columns
+                    </h6>
+
+                    <div class="requirement-item">
+                        <i class="fa-solid fa-check-circle"></i>
+                        <span>
+                            <strong>CustomerID</strong> — a unique identifier
+                            for each customer.
+                        </span>
+                    </div>
+
+                    <div class="requirement-item">
+                        <i class="fa-solid fa-check-circle"></i>
+                        <span>
+                            <strong>Gender</strong> — customer gender, if
+                            included in your dataset.
+                        </span>
+                    </div>
+
+                    <div class="requirement-item">
+                        <i class="fa-solid fa-check-circle"></i>
+                        <span>
+                            <strong>Age</strong> — customer age for analysis.
+                        </span>
+                    </div>
+
+                    <div class="requirement-item">
+                        <i class="fa-solid fa-check-circle"></i>
+                        <span>
+                            <strong>Annual Income (k$)</strong> — annual
+                            income value.
+                        </span>
+                    </div>
+
+                    <div class="requirement-item">
+                        <i class="fa-solid fa-check-circle"></i>
+                        <span>
+                            <strong>Spending Score (1-100)</strong> — customer
+                            spending score.
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="alert alert-info mt-3 mb-0">
+                    <i class="fa-solid fa-circle-info me-2"></i>
+                    Your Flask backend should check required column names,
+                    missing values, and numeric data before clustering.
+                </div>
+
+            </section>
 
         </div>
 
     </div>
 
-</div>
+    <!-- How It Works -->
+    <section class="content-card">
+
+        <div class="section-title">
+            <h5>
+                <i class="fa-solid fa-route text-primary me-2"></i>
+                How It Works
+            </h5>
+
+            <p>
+                Follow these steps to analyze your customer dataset.
+            </p>
+        </div>
+
+        <div class="row g-3">
+
+            <div class="col-12 col-md-4">
+                <div class="step-card">
+                    <div class="step-number">01</div>
+
+                    <div>
+                        <h6>Upload Dataset</h6>
+
+                        <p>
+                            Select a valid CSV file containing customer
+                            information.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="step-card">
+                    <div class="step-number">02</div>
+
+                    <div>
+                        <h6>Analyze Data</h6>
+
+                        <p>
+                            Review customer records, column details,
+                            and missing values.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="step-card">
+                    <div class="step-number">03</div>
+
+                    <div>
+                        <h6>Run Clustering</h6>
+
+                        <p>
+                            Apply K-Means clustering and inspect the
+                            resulting customer segments.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 mt-4">
+
+            <a href="{{ url_for('index') }}"
+               class="btn btn-outline-secondary">
+                <i class="fa-solid fa-house me-2"></i>
+                Back to Dashboard
+            </a>
+
+            <a href="{{ url_for('analysis') }}"
+               class="btn btn-outline-primary">
+                <i class="fa-solid fa-database me-2"></i>
+                Data Analysis
+            </a>
+
+        </div>
+
+    </section>
+
+    <footer class="footer">
+        Customer Segmentation | AI Analytics
+        <span class="mx-2">•</span>
+        Dataset Management
+    </footer>
+
+</main>
+
+<!-- Bootstrap JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const sidebar = document.getElementById("sidebar");
+    const menuToggle = document.getElementById("menuToggle");
+
+    const uploadZone = document.getElementById("uploadZone");
+    const datasetFile = document.getElementById("datasetFile");
+    const selectedFile = document.getElementById("selectedFile");
+    const fileName = document.getElementById("fileName");
+    const fileSize = document.getElementById("fileSize");
+    const uploadButton = document.getElementById("uploadButton");
+    const removeFile = document.getElementById("removeFile");
+    const uploadForm = document.getElementById("uploadForm");
+
+    // Mobile sidebar
+    menuToggle.addEventListener("click", function() {
+        const isOpen = sidebar.classList.toggle("open");
+
+        menuToggle.setAttribute(
+            "aria-expanded",
+            isOpen ? "true" : "false"
+        );
+    });
+
+    document.querySelectorAll(".nav-link-custom").forEach(function(link) {
+        link.addEventListener("click", function() {
+            if (window.innerWidth <= 1100) {
+                sidebar.classList.remove("open");
+                menuToggle.setAttribute("aria-expanded", "false");
+            }
+        });
+    });
+
+    // Open file picker by clicking or pressing Enter/Space on upload area
+    uploadZone.addEventListener("click", function(event) {
+        if (event.target.closest("label")) {
+            return;
+        }
+
+        datasetFile.click();
+    });
+
+    uploadZone.addEventListener("keydown", function(event) {
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            datasetFile.click();
+        }
+    });
+
+    // Display file size in readable units
+    function formatFileSize(bytes) {
+        if (bytes < 1024) {
+            return bytes + " bytes";
+        }
+
+        if (bytes < 1024 * 1024) {
+            return (bytes / 1024).toFixed(1) + " KB";
+        }
+
+        return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+    }
+
+    // Validate file extension and show selected file details
+    function displaySelectedFile(file) {
+        if (!file) {
+            selectedFile.style.display = "none";
+            uploadButton.disabled = true;
+            return;
+        }
+
+        const isCsv = file.name.toLowerCase().endsWith(".csv");
+
+        if (!isCsv) {
+            alert("Please select a CSV file.");
+            datasetFile.value = "";
+            selectedFile.style.display = "none";
+            uploadButton.disabled = true;
+            return;
+        }
+
+        fileName.textContent = file.name;
+        fileSize.textContent = formatFileSize(file.size);
+
+        selectedFile.style.display = "flex";
+        uploadButton.disabled = false;
+    }
+
+    datasetFile.addEventListener("change", function() {
+        displaySelectedFile(
+            datasetFile.files.length ? datasetFile.files[0] : null
+        );
+    });
+
+    // Drag and drop
+    ["dragenter", "dragover"].forEach(function(eventName) {
+        uploadZone.addEventListener(eventName, function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            uploadZone.classList.add("dragover");
+        });
+    });
+
+    ["dragleave", "drop"].forEach(function(eventName) {
+        uploadZone.addEventListener(eventName, function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            uploadZone.classList.remove("dragover");
+        });
+    });
+
+    uploadZone.addEventListener("drop", function(event) {
+        const files = event.dataTransfer.files;
+
+        if (!files.length) {
+            return;
+        }
+
+        // Assign the dropped file to the form input
+        try {
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(files[0]);
+            datasetFile.files = dataTransfer.files;
+            displaySelectedFile(datasetFile.files[0]);
+        } catch (error) {
+            alert("Unable to select the dropped file. Please use Browse Files.");
+        }
+    });
+
+    // Remove selected file
+    removeFile.addEventListener("click", function() {
+        datasetFile.value = "";
+        selectedFile.style.display = "none";
+        uploadButton.disabled = true;
+    });
+
+    // Prevent accidental empty submission
+    uploadForm.addEventListener("submit", function(event) {
+        if (!datasetFile.files.length) {
+            event.preventDefault();
+            alert("Please select a CSV file before uploading.");
+            return;
+        }
+
+        if (!datasetFile.files[0].name.toLowerCase().endsWith(".csv")) {
+            event.preventDefault();
+            alert("Only CSV files are accepted.");
+            return;
+        }
+
+        uploadButton.disabled = true;
+        uploadButton.innerHTML =
+            '<span class="spinner-border spinner-border-sm me-2" ' +
+            'aria-hidden="true"></span>Uploading Dataset...';
+    });
+</script>
 
 </body>
 </html>
